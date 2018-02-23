@@ -523,17 +523,76 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) {
-		return visitChildren(ctx);
+		System.out.println("Xq 4");
+        List<Node> mem = workingList; 
+        List<Node> result = visit(ctx.xq(0));
+        workingList = mem;
+        List<Node> result2 = visit(ctx.xq(1));
+        for(Node n : result2){
+            result.add(n);
+        }
+        workingList = result;
+		return result; 
 	}
 	
 	@Override 
 	public List<Node> visitXq5(XqueryParser.Xq5Context ctx) { 
-		return visitChildren(ctx); 
+		System.out.println("Xq 5");
+        List<Node> result = new ArrayList<Node>();
+        List<Node> tmp;
+        tmp = visit(ctx.xq());
+        tmp = visit(ctx.rp());
+
+		int seen = 0;
+        for(Node e : tmp){
+            seen = 0;
+            for(Node n : result){
+                if(isEqual(e,n)){
+                    seen = 1;
+                    break;
+                }
+            }
+            if(seen != 1)
+                result.add(e);
+        }
+
+		workingList = result;
+		return result;
 	}
 	
 	@Override 
 	public List<Node> visitXq6(XqueryParser.Xq6Context ctx) { 
-		return visitChildren(ctx); 
+		System.out.println("Xq 6");
+        List<Node> result = new ArrayList<Node>();
+        int queue = 0, seen = 0;
+        List<Node> BFS;
+        List<Node> possible;
+        BFS = visit(ctx.xq());
+        while(queue < BFS.size()){
+            Node now = BFS.get(queue);
+            workingList.clear();
+            workingList.add(now);
+            NodeList children = now.getChildNodes();
+            for(int i = 0; i < children.getLength(); i++){
+                BFS.add(children.item(i));
+            }
+            possible = visit(ctx.rp());
+            for(Node e : possible){
+                seen = 0;
+                for(Node n : result){
+                    if(isEqual(e,n)){
+                        seen = 1;
+                        break;
+                    }
+                }
+                if(seen != 1)
+                    result.add(e);
+            }
+            queue += 1;
+        }
+        workingList = result;
+		return result; 
+
 	}
 	
 	@Override 
@@ -557,6 +616,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) {
 		visit(ctx.letClause());
 		workingList = visit(ctx.xq());
+        vars.clear();
 		return workingList;
 	}
 	
