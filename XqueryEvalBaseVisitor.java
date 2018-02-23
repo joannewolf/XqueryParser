@@ -303,6 +303,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		for (int i = 0; i < current.size(); i++) {
 			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));
@@ -332,6 +333,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		for (int i = 0; i < current.size(); i++) {
 			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));
@@ -573,28 +575,140 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (isEqual(sublist1.get(j), sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 
 	@Override 
-	public List<Node> visitCond1(XqueryParser.Cond1Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond1(XqueryParser.Cond1Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (isEqual(sublist1.get(j), sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond2(XqueryParser.Cond2Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond2(XqueryParser.Cond2Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (sublist1.get(j).isSameNode(sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond3(XqueryParser.Cond3Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond3(XqueryParser.Cond3Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (sublist1.get(j).isSameNode(sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond4(XqueryParser.Cond4Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond4(XqueryParser.Cond4Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
+			List<Node> sublist = visit(ctx.getChild(2));
+			if (sublist.isEmpty())
+				result.add(current.get(i));
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
@@ -603,23 +717,81 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitCond6(XqueryParser.Cond6Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond6(XqueryParser.Cond6Context ctx) {
+		workingList = visit(ctx.getChild(1));
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond7(XqueryParser.Cond7Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond7(XqueryParser.Cond7Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist1 = visit(ctx.getChild(0));
+		workingList = current;
+
+		List<Node> sublist2 = visit(ctx.getChild(2));
+
+		workingList = new ArrayList<Node>();
+		for (int i = 0; i < sublist1.size(); i++) {
+			for (int j = 0; j < sublist2.size(); j++) {
+				if (sublist1.get(i) == sublist2.get(j)) {
+					workingList.add(sublist1.get(i));
+					break;
+				}
+			}
+		}
+
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond8(XqueryParser.Cond8Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond8(XqueryParser.Cond8Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist1 = visit(ctx.getChild(0));
+		workingList = current;
+
+		List<Node> sublist2 = visit(ctx.getChild(2));
+
+		int flag1 = 0, flag2 = 0;
+		List<Node> result = new ArrayList<Node>();
+		for (int i = 0; i < current.size(); i++) {
+			boolean existed = false;
+			if (flag1 != sublist1.size() && sublist1.get(flag1).getParentNode() == current.get(i)) {
+				flag1 ++;
+				existed = true;
+			}
+			if (flag2 != sublist2.size() && sublist2.get(flag2).getParentNode() == current.get(i)) {
+				flag2 ++;
+				existed = true;
+			}
+
+			if (existed) {
+				result.add(current.get(i));
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist = visit(ctx.getChild(1));
+
+		int flag = 0;
+		for (int i = 0; i < current.size(); i++) {
+			if (flag != sublist.size() && sublist.get(flag) == current.get(i)) {
+				flag ++;
+				current.remove(i);
+				i --;
+			}
+		}
+
+		workingList = current;
+		return workingList;
 	}
 	
 }
