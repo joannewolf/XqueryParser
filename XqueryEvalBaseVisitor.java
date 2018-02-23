@@ -42,151 +42,151 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		System.out.println("open XML success!!");
 	}
 
-	@Override 
+	@Override
 	public List<Node> visitAp0(XqueryParser.Ap0Context ctx) {
 		openXMLFile(ctx.getChild(1).getText());
 
 		workingList = visit(ctx.getChild(4));
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitAp1(XqueryParser.Ap1Context ctx) {
 		openXMLFile(ctx.getChild(1).getText());
 
 		workingList = visitRpAp1((XqueryParser.RpContext)ctx.getChild(4));
 		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitRp0(XqueryParser.Rp0Context ctx) { 
-        System.out.println("In Rp0");
-        List<Node> result = new ArrayList<Node>();
-        String tagName = ctx.children.get(0).getText();
-        for(Node e : workingList){
-            NodeList n = ((Element)e).getElementsByTagName(tagName);
-            int length = n.getLength();
-            for(int i = 0; i< length; i+=1){
-                result.add((Element)n.item(i));
-            }
-        }
-        workingList = result;
-        return result;
+
+	@Override
+	public List<Node> visitRp0(XqueryParser.Rp0Context ctx) {
+		System.out.println("In Rp0");
+		List<Node> result = new ArrayList<Node>();
+		String tagName = ctx.children.get(0).getText();
+		for(Node e : workingList){
+			NodeList n = ((Element)e).getElementsByTagName(tagName);
+			int length = n.getLength();
+			for(int i = 0; i< length; i+=1){
+				result.add((Element)n.item(i));
+			}
+		}
+		workingList = result;
+		return result;
 	}
-	
-	@Override 
-	public List<Node> visitRp1(XqueryParser.Rp1Context ctx) { 
-        System.out.println("In Rp1");
-        List<Node> result = new ArrayList<Node>();
-        for(Node e : workingList){
-            NodeList n = e.getChildNodes();
-            int length = n.getLength();
-            for(int i = 0; i< length; i+=1){
-                result.add(n.item(i));
-            }
-        }
-        workingList = result;
-		return workingList; 
+
+	@Override
+	public List<Node> visitRp1(XqueryParser.Rp1Context ctx) {
+		System.out.println("In Rp1");
+		List<Node> result = new ArrayList<Node>();
+		for(Node e : workingList){
+			NodeList n = e.getChildNodes();
+			int length = n.getLength();
+			for(int i = 0; i< length; i+=1){
+				result.add(n.item(i));
+			}
+		}
+		workingList = result;
+		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitRp2(XqueryParser.Rp2Context ctx) { 
-        System.out.println("In Rp2");
-		return workingList; 
+
+	@Override
+	public List<Node> visitRp2(XqueryParser.Rp2Context ctx) {
+		System.out.println("In Rp2");
+		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitRp3(XqueryParser.Rp3Context ctx) { 
-        System.out.println("In Rp3");
-        List<Node> result = new ArrayList<Node>();
-        for(Node e : workingList){
-            Node n = e.getParentNode();
-            result.add(n);     //need to change
-        }
-        workingList = result;
-		return result; 
+
+	@Override
+	public List<Node> visitRp3(XqueryParser.Rp3Context ctx) {
+		System.out.println("In Rp3");
+		List<Node> result = new ArrayList<Node>();
+		for(Node e : workingList){
+			Node n = e.getParentNode();
+			result.add(n);     //need to change
+		}
+		workingList = result;
+		return result;
 	}
-	
-	@Override 
-	public List<Node> visitRp4(XqueryParser.Rp4Context ctx) { 
-        System.out.println("In Rp4");
-        List<Node> result = new ArrayList<Node>();
-        for(Node e : workingList){
-            if(e.getNodeType() == Node.TEXT_NODE)
-                result.add(e);
-        }
-        workingList = result;
-		return result; 
+
+	@Override
+	public List<Node> visitRp4(XqueryParser.Rp4Context ctx) {
+		System.out.println("In Rp4");
+		List<Node> result = new ArrayList<Node>();
+		for(Node e : workingList){
+			if(e.getNodeType() == Node.TEXT_NODE)
+				result.add(e);
+		}
+		workingList = result;
+		return result;
 	}
-		
-	@Override 
-	public List<Node> visitRp5(XqueryParser.Rp5Context ctx) { 
-        System.out.println("In Rp5");
-        String attName = ctx.children.get(1).getText();
-        List<Node> result = new ArrayList<Node>();
-        for(Node e : workingList){
-            if(((Element)e).getAttributeNode(attName) != null)
-                result.add((Node)e);
-        }
-        workingList = result;
-		return result; 
+
+	@Override
+	public List<Node> visitRp5(XqueryParser.Rp5Context ctx) {
+		System.out.println("In Rp5");
+		String attName = ctx.children.get(1).getText();
+		List<Node> result = new ArrayList<Node>();
+		for(Node e : workingList){
+			if(((Element)e).getAttributeNode(attName) != null)
+				result.add((Node)e);
+		}
+		workingList = result;
+		return result;
 	}
-	
-	@Override 
-	public List<Node> visitRp6(XqueryParser.Rp6Context ctx) { 
+
+	@Override
+	public List<Node> visitRp6(XqueryParser.Rp6Context ctx) {
 		System.out.println("RP6!!");
-		return visitChildren(ctx.rp()); 
+		return visitChildren(ctx.rp());
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitRp7(XqueryParser.Rp7Context ctx) {
 		System.out.println("RP7!!");
-        List<Node> result = new ArrayList<Node>();
-        List<Node> tmp;
-        tmp = visit(ctx.rp(0));
-        tmp = visit(ctx.rp(1));
-        int seen = 0;
-        for(Node e : tmp){
-            seen = 0;
-            for(Node n : result){
-                if(isEqual(e,n)){
-                    seen = 1;
-                    break;
-                }
-            }
-            if(seen != 1)
-                result.add(e);
-        }
-		return result; 
+		List<Node> result = new ArrayList<Node>();
+		List<Node> tmp;
+		tmp = visit(ctx.rp(0));
+		tmp = visit(ctx.rp(1));
+		int seen = 0;
+		for(Node e : tmp){
+			seen = 0;
+			for(Node n : result){
+				if(isEqual(e,n)){
+					seen = 1;
+					break;
+				}
+			}
+			if(seen != 1)
+				result.add(e);
+		}
+		return result;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitRp8(XqueryParser.Rp8Context ctx) {
 		System.out.println("RP8!!!");
-		return visitChildren(ctx); 
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitRp9(XqueryParser.Rp9Context ctx) { 
+
+	@Override
+	public List<Node> visitRp9(XqueryParser.Rp9Context ctx) {
 		System.out.println("RP9!!!");
-        List<Node> result;
-        result = visit(ctx.rp());
-        result = visit(ctx.f()); 
-        workingList = result;
-		return workingList; 
+		List<Node> result;
+		result = visit(ctx.rp());
+		result = visit(ctx.f());
+		workingList = result;
+		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitRp10(XqueryParser.Rp10Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitRp10(XqueryParser.Rp10Context ctx) {
+		return visitChildren(ctx);
 	}
 
 	public List<Node> visitRpAp1(XqueryParser.RpContext ctx) {
 		System.out.println("RPAP1!!!");
 		return visitChildren(ctx);
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF0(XqueryParser.F0Context ctx) {
 		workingList = visit(ctx.getChild(0));
 		if (workingList != null) {
@@ -215,7 +215,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		return true;
 	}
 
-	@Override 
+	@Override
 	public List<Node> visitF1(XqueryParser.F1Context ctx) {
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
@@ -243,8 +243,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF2(XqueryParser.F2Context ctx) {
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
@@ -272,8 +272,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF3(XqueryParser.F3Context ctx) {
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
@@ -301,8 +301,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF4(XqueryParser.F4Context ctx) {
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
@@ -330,14 +330,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF5(XqueryParser.F5Context ctx) {
 		workingList = visit(ctx.getChild(1));
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF6(XqueryParser.F6Context ctx) {
 		List<Node> current = workingList;
 
@@ -358,8 +358,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF7(XqueryParser.F7Context ctx) {
 		List<Node> current = workingList;
 
@@ -389,8 +389,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 		return workingList;
 	}
-	
-	@Override 
+
+	@Override
 	public List<Node> visitF8(XqueryParser.F8Context ctx) {
 		List<Node> current = workingList;
 
@@ -408,135 +408,135 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = current;
 		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq2(XqueryParser.Xq2Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq3(XqueryParser.Xq3Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq5(XqueryParser.Xq5Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq6(XqueryParser.Xq6Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq7(XqueryParser.Xq7Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq8(XqueryParser.Xq8Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitForClause(XqueryParser.ForClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitInClause(XqueryParser.InClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitLetClause(XqueryParser.LetClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitEqClause(XqueryParser.EqClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) {
+		return visitChildren(ctx);
 	}
 
-	@Override 
-	public List<Node> visitCond1(XqueryParser.Cond1Context ctx) { 
-		return visitChildren(ctx); 
+	@Override
+	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond2(XqueryParser.Cond2Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq2(XqueryParser.Xq2Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond3(XqueryParser.Cond3Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq3(XqueryParser.Xq3Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond4(XqueryParser.Cond4Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq5(XqueryParser.Xq5Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond6(XqueryParser.Cond6Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq6(XqueryParser.Xq6Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond7(XqueryParser.Cond7Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq7(XqueryParser.Xq7Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond8(XqueryParser.Cond8Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq8(XqueryParser.Xq8Context ctx) {
+		return visitChildren(ctx);
 	}
-	
-	@Override 
-	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) {
+		return visitChildren(ctx);
 	}
-	
+
+	@Override
+	public List<Node> visitForClause(XqueryParser.ForClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitInClause(XqueryParser.InClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitLetClause(XqueryParser.LetClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitEqClause(XqueryParser.EqClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond1(XqueryParser.Cond1Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond2(XqueryParser.Cond2Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond3(XqueryParser.Cond3Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond4(XqueryParser.Cond4Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond6(XqueryParser.Cond6Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond7(XqueryParser.Cond7Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond8(XqueryParser.Cond8Context ctx) {
+		return visitChildren(ctx);
+	}
+
+	@Override
+	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) {
+		return visitChildren(ctx);
+	}
+
 }
