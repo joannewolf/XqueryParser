@@ -1,18 +1,21 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Element>> {
-	List<Element> workingList;
+public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
+	List<Node> workingList;
+	HashMap<String, List<Node>> vars;
 
 	public XqueryEvalBaseVisitor() {
-		workingList = new ArrayList<Element>();
+		workingList = new ArrayList<Node>();
 	}
 
 	public void openXMLFile(String XMLFilename) {
@@ -38,257 +41,320 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Element>> {
 	}
 
 	@Override 
-	public List<Element> visitAp0(XqueryParser.Ap0Context ctx) {
-		openXMLFile(ctx.children.get(1).getText());
+	public List<Node> visitAp0(XqueryParser.Ap0Context ctx) {
+		openXMLFile(ctx.getChild(1).getText());
 
-		List<Element> result = visit(ctx.children.get(4));
-		workingList = result;
-		return result;
+		workingList = visit(ctx.getChild(4));
+		return workingList;
 	}
 	
 	@Override 
-	public List<Element> visitAp1(XqueryParser.Ap1Context ctx) {
-		openXMLFile(ctx.children.get(1).getText());
+	public List<Node> visitAp1(XqueryParser.Ap1Context ctx) {
+		openXMLFile(ctx.getChild(1).getText());
 
-		List<Element> result = visitRpAp1((XqueryParser.RpContext)ctx.children.get(4));
-		workingList = result;
-		return result;
+		workingList = visitRpAp1((XqueryParser.RpContext)ctx.getChild(4));
+		return workingList;
 	}
 	
 	@Override 
-	public List<Element> visitRp0(XqueryParser.Rp0Context ctx) { 
+	public List<Node> visitRp0(XqueryParser.Rp0Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp1(XqueryParser.Rp1Context ctx) { 
+	public List<Node> visitRp1(XqueryParser.Rp1Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp2(XqueryParser.Rp2Context ctx) { 
+	public List<Node> visitRp2(XqueryParser.Rp2Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp3(XqueryParser.Rp3Context ctx) { 
+	public List<Node> visitRp3(XqueryParser.Rp3Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp4(XqueryParser.Rp4Context ctx) { 
+	public List<Node> visitRp4(XqueryParser.Rp4Context ctx) { 
 		return visitChildren(ctx); 
 	}
 		
 	@Override 
-	public List<Element> visitRp5(XqueryParser.Rp5Context ctx) { 
+	public List<Node> visitRp5(XqueryParser.Rp5Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp6(XqueryParser.Rp6Context ctx) { 
+	public List<Node> visitRp6(XqueryParser.Rp6Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp7(XqueryParser.Rp7Context ctx) {
+	public List<Node> visitRp7(XqueryParser.Rp7Context ctx) {
 		System.out.println("RP7!!");
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp8(XqueryParser.Rp8Context ctx) {
+	public List<Node> visitRp8(XqueryParser.Rp8Context ctx) {
 		System.out.println("RP8!!!");
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp9(XqueryParser.Rp9Context ctx) { 
+	public List<Node> visitRp9(XqueryParser.Rp9Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp10(XqueryParser.Rp10Context ctx) { 
+	public List<Node> visitRp10(XqueryParser.Rp10Context ctx) { 
 		return visitChildren(ctx); 
 	}
 
-	public List<Element> visitRpAp1(XqueryParser.RpContext ctx) {
+	public List<Node> visitRpAp1(XqueryParser.RpContext ctx) {
 		System.out.println("RPAP1!!!");
 		return visitChildren(ctx);
 	}
 	
 	@Override 
-	public List<Element> visitF0(XqueryParser.F0Context ctx) { 
+	public List<Node> visitF0(XqueryParser.F0Context ctx) {
+		workingList = visit(ctx.getChild(0));
+		if (workingList != null) {
+			for (int i = 0; i < workingList.size(); i++) {
+				workingList.set(i, workingList.get(i).getParentNode());
+			}
+		}
+		return workingList;
+	}
+	
+	@Override 
+	public List<Node> visitF1(XqueryParser.F1Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF1(XqueryParser.F1Context ctx) { 
+	public List<Node> visitF2(XqueryParser.F2Context ctx) { 
+		return visitChildren(ctx);
+	}
+	
+	@Override 
+	public List<Node> visitF3(XqueryParser.F3Context ctx) {
+
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF2(XqueryParser.F2Context ctx) { 
+	public List<Node> visitF4(XqueryParser.F4Context ctx) {
+		return visitChildren(ctx);
+	}
+	
+	@Override 
+	public List<Node> visitF5(XqueryParser.F5Context ctx) {
+		workingList = visit(ctx.getChild(1));
+		return workingList;
+	}
+	
+	@Override 
+	public List<Node> visitF6(XqueryParser.F6Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist1 = visit(ctx.getChild(0));
+		workingList = current;
+
+		List<Node> sublist2 = visit(ctx.getChild(2));
+
+		workingList = new ArrayList<Node>();
+		for (int i = 0; i < sublist1.size(); i++) {
+			for (int j = 0; j < sublist2.size(); j++) {
+				if (sublist1.get(i) == sublist2.get(j)) {
+					workingList.add(sublist1.get(i));
+					break;
+				}
+			}
+		}
+
+		return workingList;
+	}
+	
+	@Override 
+	public List<Node> visitF7(XqueryParser.F7Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist1 = visit(ctx.getChild(0));
+		workingList = current;
+
+		List<Node> sublist2 = visit(ctx.getChild(2));
+
+		int flag1 = 0, flag2 = 0;
+		List<Node> result = new ArrayList<Node>();
+		for (int i = 0; i < current.size(); i++) {
+			boolean existed = false;
+			if (flag1 != sublist1.size() && sublist1.get(flag1).getParentNode() == current.get(i)) {
+				flag1 ++;
+				existed = true;
+			}
+			if (flag2 != sublist2.size() && sublist2.get(flag2).getParentNode() == current.get(i)) {
+				flag2 ++;
+				existed = true;
+			}
+
+			if (existed) {
+				result.add(current.get(i));
+			}
+		}
+
+		workingList = result;
+		return workingList;
+	}
+	
+	@Override 
+	public List<Node> visitF8(XqueryParser.F8Context ctx) {
+		List<Node> current = workingList;
+
+		List<Node> sublist = visit(ctx.getChild(1));
+
+		int flag = 0;
+		for (int i = 0; i < current.size(); i++) {
+			if (flag != sublist.size() && sublist.get(flag) == current.get(i)) {
+				flag ++;
+				current.remove(i);
+				i --;
+			}
+		}
+
+		workingList = current;
+		return workingList;
+	}
+	
+	@Override 
+	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF3(XqueryParser.F3Context ctx) { 
+	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF4(XqueryParser.F4Context ctx) { 
+	public List<Node> visitXq2(XqueryParser.Xq2Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF5(XqueryParser.F5Context ctx) { 
+	public List<Node> visitXq3(XqueryParser.Xq3Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF6(XqueryParser.F6Context ctx) { 
+	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF7(XqueryParser.F7Context ctx) { 
+	public List<Node> visitXq5(XqueryParser.Xq5Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitF8(XqueryParser.F8Context ctx) { 
+	public List<Node> visitXq6(XqueryParser.Xq6Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq0(XqueryParser.Xq0Context ctx) { 
+	public List<Node> visitXq7(XqueryParser.Xq7Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq1(XqueryParser.Xq1Context ctx) { 
+	public List<Node> visitXq8(XqueryParser.Xq8Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq2(XqueryParser.Xq2Context ctx) { 
+	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq3(XqueryParser.Xq3Context ctx) { 
+	public List<Node> visitForClause(XqueryParser.ForClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq4(XqueryParser.Xq4Context ctx) { 
+	public List<Node> visitInClause(XqueryParser.InClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq5(XqueryParser.Xq5Context ctx) { 
+	public List<Node> visitLetClause(XqueryParser.LetClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq6(XqueryParser.Xq6Context ctx) { 
+	public List<Node> visitEqClause(XqueryParser.EqClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq7(XqueryParser.Xq7Context ctx) { 
+	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq8(XqueryParser.Xq8Context ctx) { 
+	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitXq9(XqueryParser.Xq9Context ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitForClause(XqueryParser.ForClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitInClause(XqueryParser.InClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitLetClause(XqueryParser.LetClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitEqClause(XqueryParser.EqClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitWhereClause(XqueryParser.WhereClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitReturnClause(XqueryParser.ReturnClauseContext ctx) { 
-		return visitChildren(ctx); 
-	}
-	
-	@Override 
-	public List<Element> visitCond0(XqueryParser.Cond0Context ctx) { 
+	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) { 
 		return visitChildren(ctx); 
 	}
 
 	@Override 
-	public List<Element> visitCond1(XqueryParser.Cond1Context ctx) { 
+	public List<Node> visitCond1(XqueryParser.Cond1Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond2(XqueryParser.Cond2Context ctx) { 
+	public List<Node> visitCond2(XqueryParser.Cond2Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond3(XqueryParser.Cond3Context ctx) { 
+	public List<Node> visitCond3(XqueryParser.Cond3Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond4(XqueryParser.Cond4Context ctx) { 
+	public List<Node> visitCond4(XqueryParser.Cond4Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond5(XqueryParser.Cond5Context ctx) { 
+	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond6(XqueryParser.Cond6Context ctx) { 
+	public List<Node> visitCond6(XqueryParser.Cond6Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond7(XqueryParser.Cond7Context ctx) { 
+	public List<Node> visitCond7(XqueryParser.Cond7Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond8(XqueryParser.Cond8Context ctx) { 
+	public List<Node> visitCond8(XqueryParser.Cond8Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitCond9(XqueryParser.Cond9Context ctx) { 
+	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) { 
 		return visitChildren(ctx); 
 	}
 	

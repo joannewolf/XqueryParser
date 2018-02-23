@@ -13,7 +13,7 @@ rp  : TagName       #rp0
     | '@' AttName   #rp5
     | '(' rp ')'    #rp6
     | rp '/' rp     #rp7
-    | rp '//' rp    #rp8
+    | rp '/''/' rp  #rp8
     | rp '[' f ']'  #rp9
     | rp ',' rp     #rp10
     ;
