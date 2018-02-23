@@ -1,7 +1,4 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,6 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
+	DocumentBuilderFactory factory;
+	DocumentBuilder builder;
+	Document doc;
+
 	List<Node> workingList;
 	HashMap<String, List<Node>> vars;
 
@@ -22,15 +23,15 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 	public void openXMLFile(String XMLFilename) {
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory = DocumentBuilderFactory.newInstance();
 		try {
 			// use the factory to create a documentbuilder
-			DocumentBuilder builder = factory.newDocumentBuilder();
+			builder = factory.newDocumentBuilder();
 
 			// create a new document from input source
 			FileInputStream fis = new FileInputStream(XMLFilename);
 			InputSource is = new InputSource(fis);
-			Document doc = builder.parse(is);
+			doc = builder.parse(is);
 
 			// get the first element
 			Element root = doc.getDocumentElement();
@@ -500,22 +501,26 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) {
+		Node textNode = doc.createTextNode(ctx.getChild(0).getText());
+		workingList = Arrays.asList(textNode);
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitXq2(XqueryParser.Xq2Context ctx) { 
-		return visitChildren(ctx); 
+		workingList = visit(ctx.getChild(0));
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitXq3(XqueryParser.Xq3Context ctx) { 
-		return visitChildren(ctx); 
+		workingList = visit(ctx.getChild(1));
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) { 
+	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) {
 		return visitChildren(ctx); 
 	}
 	
