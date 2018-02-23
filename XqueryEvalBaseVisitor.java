@@ -1,17 +1,58 @@
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Element>> {
+	List<Element> workingList;
+
+	public XqueryEvalBaseVisitor() {
+		workingList = new ArrayList<Element>();
+	}
+
+	public void openXMLFile(String XMLFilename) {
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		try {
+			// use the factory to create a documentbuilder
+			DocumentBuilder builder = factory.newDocumentBuilder();
+
+			// create a new document from input source
+			FileInputStream fis = new FileInputStream(XMLFilename);
+			InputSource is = new InputSource(fis);
+			Document doc = builder.parse(is);
+
+			// get the first element
+			Element root = doc.getDocumentElement();
+			workingList.add(root);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("open XML success!!");
+	}
 
 	@Override 
-	public List<Element> visitAp0(XqueryParser.Ap0Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Element> visitAp0(XqueryParser.Ap0Context ctx) {
+		openXMLFile(ctx.children.get(1).getText());
+
+		List<Element> result = visit(ctx.children.get(4));
+		workingList = result;
+		return result;
 	}
 	
 	@Override 
-	public List<Element> visitAp1(XqueryParser.Ap1Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Element> visitAp1(XqueryParser.Ap1Context ctx) {
+		openXMLFile(ctx.children.get(1).getText());
+
+		List<Element> result = visitRpAp1((XqueryParser.RpContext)ctx.children.get(4));
+		workingList = result;
+		return result;
 	}
 	
 	@Override 
@@ -50,12 +91,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Element>> {
 	}
 	
 	@Override 
-	public List<Element> visitRp7(XqueryParser.Rp7Context ctx) { 
+	public List<Element> visitRp7(XqueryParser.Rp7Context ctx) {
+		System.out.println("RP7!!");
 		return visitChildren(ctx); 
 	}
 	
 	@Override 
-	public List<Element> visitRp8(XqueryParser.Rp8Context ctx) { 
+	public List<Element> visitRp8(XqueryParser.Rp8Context ctx) {
+		System.out.println("RP8!!!");
 		return visitChildren(ctx); 
 	}
 	
@@ -67,6 +110,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Element>> {
 	@Override 
 	public List<Element> visitRp10(XqueryParser.Rp10Context ctx) { 
 		return visitChildren(ctx); 
+	}
+
+	public List<Element> visitRpAp1(XqueryParser.RpContext ctx) {
+		System.out.println("RPAP1!!!");
+		return visitChildren(ctx);
 	}
 	
 	@Override 
