@@ -1,8 +1,8 @@
 grammar Xquery;
 WS  : [ \t\r\n]+ ->skip;
 
-ap  : 'doc(' FileName ')' '/' rp
-    | 'doc(' FileName ')' '//' rp
+ap  : 'doc("' FileName '")' '/' rp
+    | 'doc("' FileName '")' '//' rp
     ;
 
 rp  : TagName
@@ -63,13 +63,12 @@ cond    : xq '=' xq
         | 'not' cond
         ;
 
-TagName : [_.a-zA-Z0-9]+;
+TagName : [a-zA-Z0-9]+;
 
 Var : '$'[_.a-zA-Z0-9]+;
 
-//StringConstant : '"'[_.a-zA-Z0-9 ]+'"';
-StringConstant : [_.a-zA-Z0-9 ]+;
+StringConstant : '"'[_.a-zA-Z0-9 ]+'"';
 
-FileName : '"'[_.a-zA-Z0-9]+'"';
+FileName : [_.a-zA-Z0-9]+;
 
 AttName : '"'[_.a-zA-Z0-9]+'"';
