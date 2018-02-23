@@ -234,17 +234,19 @@ public interface XqueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitXq7(XqueryParser.Xq7Context ctx);
 	/**
-	 * Visit a parse tree produced by {@link XqueryParser#forClause}.
+	 * Visit a parse tree produced by the {@code in0}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForClause(XqueryParser.ForClauseContext ctx);
+	T visitIn0(XqueryParser.In0Context ctx);
 	/**
-	 * Visit a parse tree produced by {@link XqueryParser#inClause}.
+	 * Visit a parse tree produced by the {@code in1}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInClause(XqueryParser.InClauseContext ctx);
+	T visitIn1(XqueryParser.In1Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link XqueryParser#letClause}.
 	 * @param ctx the parse tree
@@ -339,4 +341,18 @@ public interface XqueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCond0(XqueryParser.Cond0Context ctx);
+	/**
+	 * Visit a parse tree produced by the {@code soin0}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSoin0(XqueryParser.Soin0Context ctx);
+	/**
+	 * Visit a parse tree produced by the {@code soin1}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSoin1(XqueryParser.Soin1Context ctx);
 }

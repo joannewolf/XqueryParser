@@ -37,12 +37,13 @@ xq  : Var                                               #xq0
     | xq '/' rp                                         #xq5
     | xq '//' rp                                        #xq6
     | '<' TagName '>''{' xq '}''<''/' TagName '>'       #xq7
-    | forClause letClause? whereClause? returnClause    #xq8
+    | 'for' inClause                                    #xq8
     | letClause xq                                      #xq9
     ;
 
-forClause   : 'for' Var 'in' xq inClause*;
-inClause    : ',' Var 'in' xq;
+inClause    : Var 'in' xq letClause? whereClause? returnClause  #in0
+			| Var 'in' xq ',' inClause                          #in1
+			;
 
 letClause  : 'let' Var ':=' xq eqClause*;
 eqClause    : ',' Var ':=' xq;
@@ -56,12 +57,15 @@ cond    : xq '=' xq                                     #cond0
         | xq '==' xq                                    #cond2
         | xq 'is' xq                                    #cond3
         | 'empty' '(' xq ')'                            #cond4
-        | 'some' Var 'in' xq inClause* 'satisfies' cond #cond5
+        | 'some' someInClause                           #cond5
         | '(' cond ')'                                  #cond6
         | cond 'and' cond                               #cond7
         | cond 'or' cond                                #cond8
         | 'not' cond                                    #cond9
         ;
+someInClause    : Var 'in' xq 'satisfies' cond          #soin0
+				| Var 'in' xq ',' someInClause          #soin1
+				;
 
 TagName : [a-zA-Z0-9]+;
 

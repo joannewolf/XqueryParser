@@ -399,25 +399,25 @@ public class XqueryBaseListener implements XqueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterForClause(XqueryParser.ForClauseContext ctx) { }
+	@Override public void enterIn0(XqueryParser.In0Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitForClause(XqueryParser.ForClauseContext ctx) { }
+	@Override public void exitIn0(XqueryParser.In0Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInClause(XqueryParser.InClauseContext ctx) { }
+	@Override public void enterIn1(XqueryParser.In1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInClause(XqueryParser.InClauseContext ctx) { }
+	@Override public void exitIn1(XqueryParser.In1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -586,6 +586,30 @@ public class XqueryBaseListener implements XqueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCond0(XqueryParser.Cond0Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSoin0(XqueryParser.Soin0Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSoin0(XqueryParser.Soin0Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSoin1(XqueryParser.Soin1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSoin1(XqueryParser.Soin1Context ctx) { }
 
 	/**
 	 * {@inheritDoc}

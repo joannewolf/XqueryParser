@@ -391,25 +391,29 @@ public interface XqueryListener extends ParseTreeListener {
 	 */
 	void exitXq7(XqueryParser.Xq7Context ctx);
 	/**
-	 * Enter a parse tree produced by {@link XqueryParser#forClause}.
+	 * Enter a parse tree produced by the {@code in0}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 */
-	void enterForClause(XqueryParser.ForClauseContext ctx);
+	void enterIn0(XqueryParser.In0Context ctx);
 	/**
-	 * Exit a parse tree produced by {@link XqueryParser#forClause}.
+	 * Exit a parse tree produced by the {@code in0}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 */
-	void exitForClause(XqueryParser.ForClauseContext ctx);
+	void exitIn0(XqueryParser.In0Context ctx);
 	/**
-	 * Enter a parse tree produced by {@link XqueryParser#inClause}.
+	 * Enter a parse tree produced by the {@code in1}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 */
-	void enterInClause(XqueryParser.InClauseContext ctx);
+	void enterIn1(XqueryParser.In1Context ctx);
 	/**
-	 * Exit a parse tree produced by {@link XqueryParser#inClause}.
+	 * Exit a parse tree produced by the {@code in1}
+	 * labeled alternative in {@link XqueryParser#inClause}.
 	 * @param ctx the parse tree
 	 */
-	void exitInClause(XqueryParser.InClauseContext ctx);
+	void exitIn1(XqueryParser.In1Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link XqueryParser#letClause}.
 	 * @param ctx the parse tree
@@ -570,4 +574,28 @@ public interface XqueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCond0(XqueryParser.Cond0Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code soin0}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterSoin0(XqueryParser.Soin0Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code soin0}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitSoin0(XqueryParser.Soin0Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code soin1}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterSoin1(XqueryParser.Soin1Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code soin1}
+	 * labeled alternative in {@link XqueryParser#someInClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitSoin1(XqueryParser.Soin1Context ctx);
 }

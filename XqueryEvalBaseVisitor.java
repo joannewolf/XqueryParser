@@ -16,6 +16,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 	List<Node> workingList;
 	HashMap<String, List<Node>> vars;
+	HashMap<String, Integer> flags;
 
 	public XqueryEvalBaseVisitor() {
 		workingList = new ArrayList<Node>();
@@ -497,8 +498,15 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) { 
-		workingList = vars.getOrDefault(ctx.Var().getText(), new ArrayList<Node>());
+	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) {
+		String key = ctx.Var().getText();
+		if (flags.containsKey(key)) {
+			workingList = Arrays.asList(vars.get(key).get(flags.get(key)));
+		}
+		else {
+			workingList = vars.getOrDefault(ctx.Var().getText(), new ArrayList<Node>());
+		}
+
 		return workingList;
 	}
 	
@@ -620,14 +628,34 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		return workingList;
 	}
 	
-	@Override 
-	public List<Node> visitForClause(XqueryParser.ForClauseContext ctx) { 
-		return visitChildren(ctx); 
+	@Override
+	public List<Node> visitSoin0(XqueryParser.Soin0Context ctx) {
+		workingList = visit(ctx.xq());
+		String key = ctx.Var().getText();
+		vars.put(key, workingList);
+		flags.put(key, 0);
+		for (int i = 0; i < vars.get(key).size(); i++) {
+			flags.put(key, i);
+			workingList = visit(ctx.cond());
+			if (!workingList.isEmpty())
+				return workingList;
+		}
+		return workingList;
 	}
-	
-	@Override 
-	public List<Node> visitInClause(XqueryParser.InClauseContext ctx) { 
-		return visitChildren(ctx); 
+
+	@Override
+	public List<Node> visitSoin1(XqueryParser.Soin1Context ctx) {
+		workingList = visit(ctx.xq());
+		String key = ctx.Var().getText();
+		vars.put(key, workingList);
+		flags.put(key, 0);
+		for (int i = 0; i < vars.get(key).size(); i++) {
+			flags.put(key, i);
+			workingList = visit(ctx.someInClause());
+			if (!workingList.isEmpty())
+				return workingList;
+		}
+		return workingList;
 	}
 	
 	@Override 
@@ -635,7 +663,6 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = visit(ctx.xq());
 		vars.put(ctx.Var().getText(), workingList);
 		System.out.println("@@@" + vars.get(ctx.Var().getText()).toString());
-
 
 		List<XqueryParser.EqClauseContext> eqClauseList = ctx.eqClause();
 		for (int i = 0; i < eqClauseList.size(); i++) {
@@ -800,8 +827,23 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			// check if each element in C0 pass the condition
+			workingList = Arrays.asList(current.get(i));
+
+			// gen C1
+			List<Node> tempResult = visit(ctx.someInClause().getChild(2));
+
+			if (!tempResult.isEmpty())
+				result.add(current.get(i));
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
