@@ -617,7 +617,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq8(XqueryParser.Xq8Context ctx) { 
-		return visitChildren(ctx); 
+        List<Node> result = new ArrayList<Node>();
+        result = visit(ctx.inClause());
+        workingList = result; 
+        vars.clear();
+		return result; 
 	}
 	
 	@Override 
@@ -626,6 +630,58 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = visit(ctx.xq());
         vars.clear();
 		return workingList;
+	}
+
+    @Override
+	public List<Node> visitIn0(XqueryParser.In0Context ctx) {
+        List<Node> myResult = new ArrayList<Node>();
+        List<Node> tmpResult = new ArrayList<Node>();
+        List<Node> totalWork = visit(ctx.xq());
+        List<Node> myList = workingList;
+		String key = ctx.Var().getText();
+		vars.put(key, totalWork);
+		flags.put(key, 0);
+		for (int i = 0; i < vars.get(key).size(); i++) {
+			flags.put(key, i);
+            workingList = myList;
+            try{
+                tmpResult = visit(ctx.letClause());
+            }catch(NullPointerException e){
+            }
+            try{
+                tmpResult = visit(ctx.whereClause());
+            }catch(NullPointerException e){
+            }
+            tmpResult = visit(ctx.returnClause());
+            if(tmpResult != null){
+                for(Node e : tmpResult){
+                    myResult.add(e);
+                }
+            }
+    	}
+		return myResult;
+	}
+
+    @Override
+	public List<Node> visitIn1(XqueryParser.In1Context ctx) {
+        List<Node> myResult = new ArrayList<Node>();
+        List<Node> tmpResult = new ArrayList<Node>();
+        List<Node> totalWork = visit(ctx.xq());
+        List<Node> myList = workingList;
+		String key = ctx.Var().getText();
+		vars.put(key, totalWork);
+		flags.put(key, 0);
+		for (int i = 0; i < vars.get(key).size(); i++) {
+			flags.put(key, i);
+            workingList = myList;
+			tmpResult = visit(ctx.inClause());
+            if(tmpResult != null){
+                for(Node e : tmpResult){
+                    myResult.add(e);
+                }
+            }
+		}
+		return myResult;
 	}
 	
 	@Override
@@ -681,12 +737,12 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) { 
-		return visitChildren(ctx); 
+		return visitChildren(ctx.cond()); 
 	}
 	
 	@Override 
 	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) { 
-		return visitChildren(ctx); 
+		return visitChildren(ctx.xq()); 
 	}
 	
 	@Override 
@@ -836,13 +892,15 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 			workingList = Arrays.asList(current.get(i));
 
 			// gen C1
-			List<Node> tempResult = visit(ctx.someInClause().getChild(2));
+			List<Node> tempResult = visit(ctx.someInClause());
 
 			if (!tempResult.isEmpty())
 				result.add(current.get(i));
 		}
-
+        
 		workingList = result;
+        vars.clear();
+        flags.clear();
 		return workingList;
 	}
 	
