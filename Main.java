@@ -13,7 +13,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 public class Main {
-	public static final String expression = "doc(\"j_caesar.xml\")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE";
+	public static final String expression = "let $a := doc(\"j_caesar.xml\")//(ACT,PERSONAE)/TITLE $a";
 
 	public static void printXML(Node node) {
 		try	{
@@ -44,8 +44,8 @@ public class Main {
 		try {
 			XqueryLexer lexer = new XqueryLexer(new ANTLRInputStream(expression));
 			XqueryParser parser = new XqueryParser(new CommonTokenStream(lexer));
-			ParserRuleContext ruleContext = parser.ap();
-//			ParserRuleContext ruleContext = parser.xq();
+//			ParserRuleContext ruleContext = parser.ap();
+			ParserRuleContext ruleContext = parser.xq();
 			XqueryEvalBaseVisitor visitor = new XqueryEvalBaseVisitor();
 			List<Node> output = visitor.visit(ruleContext);
 

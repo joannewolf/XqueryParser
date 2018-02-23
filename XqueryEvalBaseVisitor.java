@@ -19,6 +19,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 	public XqueryEvalBaseVisitor() {
 		workingList = new ArrayList<Node>();
+		vars = new HashMap<String, List<Node>>();
 	}
 
 	public void openXMLFile(String XMLFilename) {
@@ -573,6 +574,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public List<Node> visitLetClause(XqueryParser.LetClauseContext ctx) { 
 		workingList = visit(ctx.xq());
 		vars.put(ctx.Var().getText(), workingList);
+		System.out.println("@@@" + vars.get(ctx.Var().getText()).toString());
+
 
 		List<XqueryParser.EqClauseContext> eqClauseList = ctx.eqClause();
 		for (int i = 0; i < eqClauseList.size(); i++) {
