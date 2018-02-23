@@ -63,12 +63,18 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         System.out.println("In Rp0");
         List<Node> result = new ArrayList<Node>();
         String tagName = ctx.children.get(0).getText();
-        for(Node e : workingList){
-            NodeList n = ((Element)e).getElementsByTagName(tagName);
-            int length = n.getLength();
-            for(int i = 0; i< length; i+=1){
-                result.add((Element)n.item(i));
-            }
+        if (workingList != null) {
+	        for(Node e : workingList){
+		        if (e.getNodeType() == Node.ELEMENT_NODE) {
+			        NodeList n = ((Element)e).getChildNodes();
+//			        NodeList n = ((Element)e).getElementsByTagName(tagName);
+			        int length = n.getLength();
+			        for(int i = 0; i< length; i+=1){
+			        	if (n.item(i).getNodeType() == Node.ELEMENT_NODE && ((Element)n.item(i)).getTagName().equals(tagName))
+				            result.add((Element)n.item(i));
+			        }
+		        }
+	        }
         }
         workingList = result;
         return result;
@@ -78,12 +84,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public List<Node> visitRp1(XqueryParser.Rp1Context ctx) { 
         System.out.println("In Rp1");
         List<Node> result = new ArrayList<Node>();
-        for(Node e : workingList){
-            NodeList n = e.getChildNodes();
-            int length = n.getLength();
-            for(int i = 0; i< length; i+=1){
-                result.add(n.item(i));
-            }
+        for(Node e : workingList) {
+        	if (e.getNodeType() == Node.ELEMENT_NODE) {
+		        NodeList n = e.getChildNodes();
+		        int length = n.getLength();
+		        for(int i = 0; i< length; i+=1){
+			        result.add(n.item(i));
+		        }
+	        }
         }
         workingList = result;
 		return workingList; 
@@ -135,7 +143,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	@Override 
 	public List<Node> visitRp6(XqueryParser.Rp6Context ctx) { 
 		System.out.println("RP6!!");
-		return visitChildren(ctx.rp()); 
+		return visit(ctx.rp());
 	}
 	
 	@Override 
@@ -144,8 +152,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         List<Node> result = new ArrayList<Node>();
         List<Node> tmp;
         tmp = visit(ctx.rp(0));
+		System.out.println(tmp.size() + " RP7");
+		System.out.println(workingList.size() + " RP7&&");
         tmp = visit(ctx.rp(1));
-        int seen = 0;
+
+		int seen = 0;
         for(Node e : tmp){
             seen = 0;
             for(Node n : result){
@@ -157,7 +168,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
             if(seen != 1)
                 result.add(e);
         }
-		return result; 
+		System.out.println(result.size() + " QQ");
+
+		workingList = result;
+		return result;
 	}
 	
 	@Override 
@@ -188,7 +202,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 if(seen != 1)
                     result.add(e);
             }
-            
+            queue += 1;
         }
         workingList = result;
 		return result; 
@@ -214,6 +228,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         for(Node n : result2){
             result.add(n);
         }
+        System.out.println("RP10 result " + result.size());
         workingList = result;
 		return result; 
 	}
@@ -245,7 +260,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 if(seen != 1)
                     result.add(e);
             }
-            
+	        queue += 1;
         }
         workingList = result;
 
@@ -265,7 +280,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 	boolean isEqual(Node node1, Node node2) {
 		if (!node1.getTextContent().equals(node2.getTextContent())
-				|| !((Element) node1).getTagName().equals(((Element) node2).getTagName())
+				|| (node1.getNodeType() == Node.ELEMENT_NODE && node2.getNodeType() == Node.ELEMENT_NODE && !((Element) node1).getTagName().equals(((Element) node2).getTagName()))
 				|| !(node1.getChildNodes().getLength() == node2.getChildNodes().getLength()))
 			return false;
 
@@ -274,7 +289,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		NodeList children2 = node2.getChildNodes();
 		for (int i = 0; i < len; i++) {
 			if (!children1.item(i).getTextContent().equals(children2.item(i).getTextContent())
-					|| !((Element) children1.item(i)).getTagName().equals(((Element) children2.item(i)).getTagName())
+					|| (children1.item(i).getNodeType() == Node.ELEMENT_NODE && children2.item(i).getNodeType() == Node.ELEMENT_NODE && !((Element) children1.item(i)).getTagName().equals(((Element) children2.item(i)).getTagName()))
 					|| !(children1.item(i).getChildNodes().getLength() == children2.item(i).getChildNodes().getLength()))
 				return false;
 		}
@@ -346,6 +361,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		for (int i = 0; i < current.size(); i++) {
 			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));
@@ -375,6 +391,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		for (int i = 0; i < current.size(); i++) {
 			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));

@@ -13,7 +13,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 public class Main {
-	public static final String expression = "doc(\"j_caesar.xml\")/ACT[./TITLE]";
+	public static final String expression = "doc(\"j_caesar.xml\")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE";
 
 	public static void printXML(Node node) {
 		try	{
