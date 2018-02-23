@@ -1,12 +1,14 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -128,26 +130,139 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		}
 		return workingList;
 	}
-	
+
+	boolean isEqual(Node node1, Node node2) {
+		if (!node1.getTextContent().equals(node2.getTextContent())
+				|| !((Element) node1).getTagName().equals(((Element) node2).getTagName())
+				|| !(node1.getChildNodes().getLength() == node2.getChildNodes().getLength()))
+			return false;
+
+		int len = node1.getChildNodes().getLength();
+		NodeList children1 = node1.getChildNodes();
+		NodeList children2 = node2.getChildNodes();
+		for (int i = 0; i < len; i++) {
+			if (!children1.item(i).getTextContent().equals(children2.item(i).getTextContent())
+					|| !((Element) children1.item(i)).getTagName().equals(((Element) children2.item(i)).getTagName())
+					|| !(children1.item(i).getChildNodes().getLength() == children2.item(i).getChildNodes().getLength()))
+				return false;
+		}
+		return true;
+	}
+
 	@Override 
-	public List<Node> visitF1(XqueryParser.F1Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitF1(XqueryParser.F1Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (isEqual(sublist1.get(j), sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitF2(XqueryParser.F2Context ctx) { 
-		return visitChildren(ctx);
+	public List<Node> visitF2(XqueryParser.F2Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (isEqual(sublist1.get(j), sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitF3(XqueryParser.F3Context ctx) {
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
 
-		return visitChildren(ctx); 
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (sublist1.get(j).isSameNode(sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitF4(XqueryParser.F4Context ctx) {
-		return visitChildren(ctx);
+		List<Node> current = workingList;
+		List<Node> result = new ArrayList<Node>();
+
+		for (int i = 0; i < current.size(); i++) {
+			List<Node> tempCurrent = Arrays.asList(current.get(i));
+			List<Node> sublist1 = visit(ctx.getChild(0));
+			workingList = tempCurrent;
+			List<Node> sublist2 = visit(ctx.getChild(2));
+
+			boolean pass = false;
+			for (int j = 0; j < sublist1.size(); j++) {
+				for (int k = 0; k < sublist2.size(); k++) {
+					if (sublist1.get(j).isSameNode(sublist2.get(k))) {
+						pass = true;
+						result.add(current.get(i));
+						break;
+					}
+				}
+				if (pass)
+					break;
+			}
+		}
+
+		workingList = result;
+		return workingList;
 	}
 	
 	@Override 
