@@ -60,43 +60,104 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitRp0(XqueryParser.Rp0Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp0");
+        List<Node> result = new ArrayList<Node>();
+        String tagName = ctx.children.get(0).getText();
+        for(Node e : workingList){
+            NodeList n = ((Element)e).getElementsByTagName(tagName);
+            int length = n.getLength();
+            for(int i = 0; i< length; i+=1){
+                result.add((Element)n.item(i));
+            }
+        }
+        workingList = result;
+        return result;
 	}
 	
 	@Override 
 	public List<Node> visitRp1(XqueryParser.Rp1Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp1");
+        List<Node> result = new ArrayList<Node>();
+        for(Node e : workingList){
+            NodeList n = e.getChildNodes();
+            int length = n.getLength();
+            for(int i = 0; i< length; i+=1){
+                result.add(n.item(i));
+            }
+        }
+        workingList = result;
+		return workingList; 
 	}
 	
 	@Override 
 	public List<Node> visitRp2(XqueryParser.Rp2Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp2");
+		return workingList; 
 	}
 	
 	@Override 
 	public List<Node> visitRp3(XqueryParser.Rp3Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp3");
+        List<Node> result = new ArrayList<Node>();
+        for(Node e : workingList){
+            Node n = e.getParentNode();
+            result.add(n);     //need to change
+        }
+        workingList = result;
+		return result; 
 	}
 	
 	@Override 
 	public List<Node> visitRp4(XqueryParser.Rp4Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp4");
+        List<Node> result = new ArrayList<Node>();
+        for(Node e : workingList){
+            if(e.getNodeType() == Node.TEXT_NODE)
+                result.add(e);
+        }
+        workingList = result;
+		return result; 
 	}
 		
 	@Override 
 	public List<Node> visitRp5(XqueryParser.Rp5Context ctx) { 
-		return visitChildren(ctx); 
+        System.out.println("In Rp5");
+        String attName = ctx.children.get(1).getText();
+        List<Node> result = new ArrayList<Node>();
+        for(Node e : workingList){
+            if(((Element)e).getAttributeNode(attName) != null)
+                result.add((Node)e);
+        }
+        workingList = result;
+		return result; 
 	}
 	
 	@Override 
 	public List<Node> visitRp6(XqueryParser.Rp6Context ctx) { 
-		return visitChildren(ctx); 
+		System.out.println("RP6!!");
+		return visitChildren(ctx.rp()); 
 	}
 	
 	@Override 
 	public List<Node> visitRp7(XqueryParser.Rp7Context ctx) {
 		System.out.println("RP7!!");
-		return visitChildren(ctx); 
+        List<Node> result = new ArrayList<Node>();
+        List<Node> tmp;
+        tmp = visit(ctx.rp(0));
+        tmp = visit(ctx.rp(1));
+        int seen = 0;
+        for(Node e : tmp){
+            seen = 0;
+            for(Node n : result){
+                if(isEqual(e,n)){
+                    seen = 1;
+                    break;
+                }
+            }
+            if(seen != 1)
+                result.add(e);
+        }
+		return result; 
 	}
 	
 	@Override 
@@ -107,7 +168,12 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitRp9(XqueryParser.Rp9Context ctx) { 
-		return visitChildren(ctx); 
+		System.out.println("RP9!!!");
+        List<Node> result;
+        result = visit(ctx.rp());
+        result = visit(ctx.f()); 
+        workingList = result;
+		return workingList; 
 	}
 	
 	@Override 
