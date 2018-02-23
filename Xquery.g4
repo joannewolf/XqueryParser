@@ -1,44 +1,44 @@
 grammar Xquery;
 WS  : [ \t\r\n]+ ->skip;
 
-ap  : 'doc("' FileName '")' '/' rp
-    | 'doc("' FileName '")' '//' rp
+ap  : 'doc("' FileName '")' '/' rp  #ap0
+    | 'doc("' FileName '")' '//' rp #ap1
     ;
 
-rp  : TagName
-    | '*' 
-    | '.' 
-    | '..' 
-    | 'text()' 
-    | '@' AttName
-    | '(' rp ')'
-    | rp '/' rp 
-    | rp '/''/' rp 
-    | rp '[' f ']' 
-    | rp ',' rp
+rp  : TagName       #rp0
+    | '*'           #rp1
+    | '.'           #rp2
+    | '..'          #rp3
+    | 'text()'      #rp4
+    | '@' AttName   #rp5
+    | '(' rp ')'    #rp6
+    | rp '/' rp     #rp7
+    | rp '/''/' rp  #rp8
+    | rp '[' f ']'  #rp9
+    | rp ',' rp     #rp10
     ;
 
-f   : rp 
-    | rp '=' rp 
-    | rp 'eq' rp 
-    | rp '==' rp 
-    | rp 'is' rp
-    | '('f')' 
-    | f 'and' f 
-    | f 'or' f 
-    | 'not' f
+f   : rp            #f0
+    | rp '=' rp     #f1
+    | rp 'eq' rp    #f2
+    | rp '==' rp    #f3
+    | rp 'is' rp    #f4
+    | '('f')'       #f5
+    | f 'and' f     #f6
+    | f 'or' f      #f7
+    | 'not' f       #f8
     ;
 
-xq  : Var
-    | StringConstant
-    | ap
-    | '(' xq ')'
-    | xq ',' xq
-    | xq '/' rp
-    | xq '//' rp
-    | '<' TagName '>''{' xq '}''<''/' TagName '>'
-    | forClause letClause? whereClause? returnClause
-    | letClause xq
+xq  : Var                                               #xq0
+    | StringConstant                                    #xq1
+    | ap                                                #xq2
+    | '(' xq ')'                                        #xq3
+    | xq ',' xq                                         #xq4
+    | xq '/' rp                                         #xq5
+    | xq '//' rp                                        #xq6
+    | '<' TagName '>''{' xq '}''<''/' TagName '>'       #xq7
+    | forClause letClause? whereClause? returnClause    #xq8
+    | letClause xq                                      #xq9
     ;
 
 forClause   : 'for' Var 'in' xq inClause*;
@@ -51,16 +51,16 @@ whereClause : 'where' cond;
 
 returnClause    : 'return' xq;
 
-cond    : xq '=' xq
-        | xq 'eq' xq
-        | xq '==' xq
-        | xq 'is' xq
-        | 'empty' '(' xq ')'
-        | 'some' Var 'in' xq inClause* 'satisfies' cond
-        | '(' cond ')'
-        | cond 'and' cond
-        | cond 'or' cond
-        | 'not' cond
+cond    : xq '=' xq                                     #cond0
+        | xq 'eq' xq                                    #cond1
+        | xq '==' xq                                    #cond2
+        | xq 'is' xq                                    #cond3
+        | 'empty' '(' xq ')'                            #cond4
+        | 'some' Var 'in' xq inClause* 'satisfies' cond #cond5
+        | '(' cond ')'                                  #cond6
+        | cond 'and' cond                               #cond7
+        | cond 'or' cond                                #cond8
+        | 'not' cond                                    #cond9
         ;
 
 TagName : [a-zA-Z0-9]+;
