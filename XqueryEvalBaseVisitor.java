@@ -497,7 +497,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq0(XqueryParser.Xq0Context ctx) { 
-		return visitChildren(ctx); 
+		workingList = vars.getOrDefault(ctx.Var().getText(), new ArrayList<Node>());
+		return workingList;
 	}
 	
 	@Override 
@@ -521,7 +522,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq4(XqueryParser.Xq4Context ctx) {
-		return visitChildren(ctx); 
+		return visitChildren(ctx);
 	}
 	
 	@Override 
@@ -536,7 +537,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq7(XqueryParser.Xq7Context ctx) { 
-		return visitChildren(ctx); 
+		List<Node> children = visit(ctx.xq());
+		Node parentNode = doc.createElement(ctx.TagName(0).getText());
+		for (int i = 0; i < children.size(); i++) {
+			parentNode.appendChild(children.get(i).cloneNode(true));
+		}
+
+		workingList = Arrays.asList(parentNode);
+		return workingList;
 	}
 	
 	@Override 
@@ -545,8 +553,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) { 
-		return visitChildren(ctx); 
+	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) {
+		visit(ctx.letClause());
+		workingList = visit(ctx.xq());
+		return workingList;
 	}
 	
 	@Override 
@@ -561,12 +571,22 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitLetClause(XqueryParser.LetClauseContext ctx) { 
-		return visitChildren(ctx); 
+		workingList = visit(ctx.xq());
+		vars.put(ctx.Var().getText(), workingList);
+
+		List<XqueryParser.EqClauseContext> eqClauseList = ctx.eqClause();
+		for (int i = 0; i < eqClauseList.size(); i++) {
+			workingList = visit(eqClauseList.get(i));
+		}
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitEqClause(XqueryParser.EqClauseContext ctx) { 
-		return visitChildren(ctx); 
+		workingList = visit(ctx.xq());
+		vars.put(ctx.Var().getText(), workingList);
+
+		return workingList;
 	}
 	
 	@Override 
