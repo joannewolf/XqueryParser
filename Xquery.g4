@@ -55,7 +55,7 @@ cond    : xq '=' xq
         | xq 'eq' xq
         | xq '==' xq
         | xq 'is' xq
-        | 'empty(' xq ')'
+        | 'empty' '(' xq ')'
         | 'some' Var 'in' xq inClause* 'satisfies' cond
         | '(' cond ')'
         | cond 'and' cond
@@ -65,9 +65,10 @@ cond    : xq '=' xq
 
 TagName : [_.a-zA-Z0-9]+;
 
-Var : [_.a-zA-Z0-9]+;
+Var : '$'[_.a-zA-Z0-9]+;
 
-StringConstant : [_.a-zA-Z0-9]+;
+//StringConstant : '"'[_.a-zA-Z0-9 ]+'"';
+StringConstant : [_.a-zA-Z0-9 ]+;
 
 FileName : '"'[_.a-zA-Z0-9]+'"';
 
