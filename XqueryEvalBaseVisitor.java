@@ -13,6 +13,9 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	DocumentBuilderFactory factory;
 	DocumentBuilder builder;
 	Document doc;
+//	List<DocumentBuilderFactory> factory;
+//	List<DocumentBuilder> builder;
+//	List<Document> doc;
 
 	List<Node> workingList;
 	HashMap<String, List<Node>> vars;
@@ -21,23 +24,34 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public XqueryEvalBaseVisitor() {
 		workingList = new ArrayList<Node>();
 		vars = new HashMap<String, List<Node>>();
+		flags = new HashMap<String, Integer>();
 	}
 
 	public void openXMLFile(String XMLFilename) {
 
-		factory = DocumentBuilderFactory.newInstance();
 		try {
-			// use the factory to create a documentbuilder
-			builder = factory.newDocumentBuilder();
+			if (doc == null) {
+//				factory.add(DocumentBuilderFactory.newInstance());
+				factory = DocumentBuilderFactory.newInstance();
 
-			// create a new document from input source
-			FileInputStream fis = new FileInputStream(XMLFilename);
-			InputSource is = new InputSource(fis);
-			doc = builder.parse(is);
+				// use the factory to create a documentbuilder
+//			builder.add(factory.get(factory.size() - 1).newDocumentBuilder());
+				builder = factory.newDocumentBuilder();
+
+				// create a new document from input source
+				FileInputStream fis = new FileInputStream(XMLFilename);
+				InputSource is = new InputSource(fis);
+//			doc.add(builder.get(builder.size() - 1).parse(is));
+				doc = builder.parse(is);
+				fis.close();
+			}
 
 			// get the first element
+
 			Element root = doc.getDocumentElement();
-			workingList.add(root);
+			workingList = Arrays.asList(root);
+//			workingList.add(root);
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -63,7 +77,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitRp0(XqueryParser.Rp0Context ctx) { 
-        System.out.println("In Rp0");
+//        System.out.println("In Rp0");
         List<Node> result = new ArrayList<Node>();
         String tagName = ctx.children.get(0).getText();
         if (workingList != null) {
@@ -123,8 +137,13 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         System.out.println("In Rp4");
         List<Node> result = new ArrayList<Node>();
         for(Node e : workingList){
-            if(e.getNodeType() == Node.TEXT_NODE)
-                result.add(e);
+        	if (e.getNodeType() == Node.ELEMENT_NODE) {
+		        NodeList children = e.getChildNodes();
+		        for (int i = 0; i < children.getLength(); i++) {
+			        if (children.item(i).getNodeType() == Node.TEXT_NODE)
+				        result.add(children.item(i));
+		        }
+	        }
         }
         workingList = result;
 		return result; 
@@ -136,8 +155,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         String attName = ctx.children.get(1).getText();
         List<Node> result = new ArrayList<Node>();
         for(Node e : workingList){
-            if(((Element)e).getAttributeNode(attName) != null)
-                result.add((Node)e);
+            if(e.getNodeType() == Node.ELEMENT_NODE) {
+            	 Node attr = ((Element)e).getAttributeNode(attName);
+            	 if (attr != null)
+		             result.add(attr);
+            }
         }
         workingList = result;
 		return result; 
@@ -245,8 +267,9 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         BFS = workingList;
         while(queue < BFS.size()){
             Node now = BFS.get(queue);
-            workingList.clear();
-            workingList.add(now);
+//            workingList.clear();
+//            workingList.add(now);
+	        workingList = Arrays.asList(now);
             NodeList children = now.getChildNodes();
             for(int i = 0; i < children.getLength(); i++){
                 BFS.add(children.item(i));
@@ -512,7 +535,9 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq1(XqueryParser.Xq1Context ctx) {
-		Node textNode = doc.createTextNode(ctx.getChild(0).getText());
+		String text = ctx.getChild(0).getText();
+		text = text.substring(1, text.length() - 1);
+		Node textNode = doc.createTextNode(text);
 		workingList = Arrays.asList(textNode);
 		return workingList;
 	}
@@ -620,7 +645,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         List<Node> result = new ArrayList<Node>();
         result = visit(ctx.inClause());
         workingList = result; 
-        vars.clear();
+//        vars.clear();
+//        flags.clear();
 		return result; 
 	}
 	
@@ -628,7 +654,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) {
 		visit(ctx.letClause());
 		workingList = visit(ctx.xq());
-        vars.clear();
+//        vars.clear();
 		return workingList;
 	}
 
@@ -641,22 +667,30 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		String key = ctx.Var().getText();
 		vars.put(key, totalWork);
 		flags.put(key, 0);
-		for (int i = 0; i < vars.get(key).size(); i++) {
+	    System.out.println("in1 " + vars.get(key).size());
+
+	    for (int i = 0; i < vars.get(key).size(); i++) {
+	    	System.out.println( vars.get(key).get(i).getTextContent());
 			flags.put(key, i);
-            workingList = myList;
-            try{
+
+			try{
                 tmpResult = visit(ctx.letClause());
             }catch(NullPointerException e){
             }
+
             try{
+            	workingList = Arrays.asList(vars.get(key).get(i));
                 tmpResult = visit(ctx.whereClause());
+	            System.out.println("where tempResult " + tmpResult.size());
+
             }catch(NullPointerException e){
             }
-            tmpResult = visit(ctx.returnClause());
-            if(tmpResult != null){
-                for(Node e : tmpResult){
-                    myResult.add(e);
-                }
+
+//		    workingList = tmpResult;
+		    workingList = Arrays.asList(vars.get(key).get(i));
+            workingList = visit(ctx.returnClause());
+            if(tmpResult != null && tmpResult.size() > 0){
+                myResult.addAll(workingList);
             }
     	}
 		return myResult;
@@ -671,9 +705,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		String key = ctx.Var().getText();
 		vars.put(key, totalWork);
 		flags.put(key, 0);
+		System.out.println("in0 " + vars.get(key).size());
 		for (int i = 0; i < vars.get(key).size(); i++) {
 			flags.put(key, i);
-            workingList = myList;
+//            workingList = myList;
+            workingList = Arrays.asList(vars.get(key).get(flags.get(key)));
 			tmpResult = visit(ctx.inClause());
             if(tmpResult != null){
                 for(Node e : tmpResult){
@@ -736,17 +772,23 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	}
 	
 	@Override 
-	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) { 
-		return visitChildren(ctx.cond()); 
+	public List<Node> visitWhereClause(XqueryParser.WhereClauseContext ctx) {
+		return visit(ctx.cond());
 	}
 	
 	@Override 
-	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) { 
-		return visitChildren(ctx.xq()); 
+	public List<Node> visitReturnClause(XqueryParser.ReturnClauseContext ctx) {
+		workingList = visit(ctx.xq());
+		if (workingList != null)
+			System.out.println("return size " + workingList.size());
+		else
+			System.out.println("return null!");
+		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) {
+		System.out.println("In cond0!!");
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
 
@@ -754,8 +796,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 			List<Node> tempCurrent = Arrays.asList(current.get(i));
 			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
+//			System.out.println(sublist1.size() + " ~~ " + sublist1.get(0).getTextContent());
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));
+//			System.out.println(sublist2.size() + " ~~~ " + sublist2.get(0).getTextContent());
 
 			boolean pass = false;
 			for (int j = 0; j < sublist1.size(); j++) {
@@ -899,8 +943,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		}
         
 		workingList = result;
-        vars.clear();
-        flags.clear();
+//        vars.clear();
+//        flags.clear();
 		return workingList;
 	}
 	
@@ -941,44 +985,33 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 		List<Node> sublist2 = visit(ctx.getChild(2));
 
-		int flag1 = 0, flag2 = 0;
-		List<Node> result = new ArrayList<Node>();
-		for (int i = 0; i < current.size(); i++) {
-			boolean existed = false;
-			if (flag1 != sublist1.size() && sublist1.get(flag1).getParentNode() == current.get(i)) {
-				flag1 ++;
-				existed = true;
-			}
-			if (flag2 != sublist2.size() && sublist2.get(flag2).getParentNode() == current.get(i)) {
-				flag2 ++;
-				existed = true;
+		for (int i = 0; i < sublist1.size(); i++) {
+			boolean seen = false;
+			for (int j = 0; j < sublist2.size(); j++) {
+				if (sublist1.get(i) == sublist2.get(j)) {
+					seen = true;
+					break;
+				}
 			}
 
-			if (existed) {
-				result.add(current.get(i));
-			}
+			if (!seen)
+				sublist2.add(sublist1.get(i));
 		}
 
-		workingList = result;
+		workingList = sublist2;
 		return workingList;
 	}
 	
 	@Override 
 	public List<Node> visitCond9(XqueryParser.Cond9Context ctx) {
 		List<Node> current = workingList;
-
 		List<Node> sublist = visit(ctx.getChild(1));
-
-		int flag = 0;
-		for (int i = 0; i < current.size(); i++) {
-			if (flag != sublist.size() && sublist.get(flag) == current.get(i)) {
-				flag ++;
-				current.remove(i);
-				i --;
-			}
+		if (sublist.isEmpty()) {
+			workingList = current;
 		}
-
-		workingList = current;
+		else {
+			workingList.clear();
+		}
 		return workingList;
 	}
 	
