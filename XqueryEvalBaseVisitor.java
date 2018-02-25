@@ -699,9 +699,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq9(XqueryParser.Xq9Context ctx) {
+        int myDocNum = docNum;
 		visit(ctx.letClause());
 		workingList = visit(ctx.xq());
 //        vars.clear();
+        while(myDocNum < docNum){
+            closeXMLFile();
+            docNum -= 1;
+        }
 		return workingList;
 	}
 
@@ -976,7 +981,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitCond5(XqueryParser.Cond5Context ctx) {
-		List<Node> current = workingList;
+		int myDocNum = docNum;
+        List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
 
 		for (int i = 0; i < current.size(); i++) {
@@ -993,6 +999,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = result;
 //        vars.clear();
 //        flags.clear();
+        while(myDocNum < docNum){
+            closeXMLFile();
+            docNum -= 1;
+        }
 		return workingList;
 	}
 	
