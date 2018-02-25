@@ -14,14 +14,14 @@ import java.util.List;
 
 public class Main {
 	public static final String expression = "for    $pgroup in doc(\"j_caesar.xml\")//PGROUP,\n" +
-			"        $persona in $pgroup/PERSONA,\n" +
-			"        $act in doc(\"j_caesar.xml\")//ACT,\n" +
-			"        $speaker in $act//SPEECH/SPEAKER\n" +
-			" where $persona/text() = $speaker/text() and $persona/text()=\"MARULLUS\"\n" +
-			" return <tuple>{<act>{$act/TITLE}</act>,\n" +
-			"         <speaker>{$speaker}</speaker>,\n" +
-			"         <persona>{$persona}</persona>}\n" +
-			"         </tuple>\n";
+			"\t\t\t        $persona in $pgroup/PERSONA,\n" +
+			"\t\t\t        $act in doc(\"j_caesar.xml\")//ACT,\n" +
+			"\t\t\t        $speaker in $act//SPEECH/SPEAKER\n" +
+			"\t\t\t where $persona/text() = $speaker/text() and $persona/text()=\"MARULLUS\"\n" +
+			"\t\t\t return <tuple>{<act>{$act/TITLE}</act>,\n" +
+			"\t\t\t         <speaker>{$speaker}</speaker>,\n" +
+			"\t\t\t         <persona>{$persona}</persona>}\n" +
+			"\t\t\t         </tuple>";
 
 	public static void printXML(Node node) {
 		try	{
