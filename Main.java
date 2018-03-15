@@ -13,7 +13,15 @@ import java.io.StringWriter;
 import java.util.List;
 
 public class Main {
-	public static final String expression = "let $a := doc(\"j_caesar.xml\")//(ACT,PERSONAE)/TITLE $a";
+	public static final String expression = "for    $pgroup in doc(\"j_caesar.xml\")//PGROUP,\n" +
+			"        $persona in $pgroup/PERSONA,\n" +
+			"        $act in doc(\"j_caesar.xml\")//ACT,\n" +
+			"        $speaker in $act//SPEECH/SPEAKER\n" +
+			" where $persona/text() = $speaker/text() and $persona/text()=\"MARULLUS\"\n" +
+			" return <tuple>{<act>{$act/TITLE}</act>,\n" +
+			"         <speaker>{$speaker}</speaker>,\n" +
+			"         <persona>{$persona}</persona>}\n" +
+			"         </tuple>\n";
 
 	public static void printXML(Node node) {
 		try	{

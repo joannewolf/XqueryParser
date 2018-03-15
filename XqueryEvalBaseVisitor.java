@@ -17,12 +17,13 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	List<DocumentBuilder> builder;
 	List<Document> doc;
     int docNum;
-
+    int pass;
 	List<Node> workingList;
 	HashMap<String, List<Node>> vars;
 	HashMap<String, Integer> flags;
 
 	public XqueryEvalBaseVisitor() {
+        pass = 0;
         factory = new ArrayList<DocumentBuilderFactory>();
         builder = new ArrayList<DocumentBuilder>();
         doc = new ArrayList<Document>();
@@ -487,28 +488,38 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		List<Node> sublist2 = visit(ctx.getChild(2));
 
 		workingList = new ArrayList<Node>();
-		for (int i = 0; i < sublist1.size(); i++) {
+		if (sublist1.size() > 0 && sublist2.size() > 0) {
+			workingList.add(sublist1.get(0));
+        }
+		/*for (int i = 0; i < sublist1.size(); i++) {
 			for (int j = 0; j < sublist2.size(); j++) {
-				if (sublist1.get(i) == sublist2.get(j)) {
+				//if (sublist1.get(i) == sublist2.get(j)) {
+				if (sublist1.size() > 0 && sublist2.size() > 0) {
 					workingList.add(sublist1.get(i));
 					break;
 				}
 			}
 		}
-
+        */
 		return workingList;
 	}
 	
 	@Override 
-	public List<Node> visitF7(XqueryParser.F7Context ctx) {
+	public List<Node> visitF7(XqueryParser.F7Context ctx) { //Or
 		List<Node> current = workingList;
 
 		List<Node> sublist1 = visit(ctx.getChild(0));
 		workingList = current;
 
 		List<Node> sublist2 = visit(ctx.getChild(2));
+		
+		workingList = new ArrayList<Node>();
+        if (sublist1.size() > 0)
+			workingList.add(sublist1.get(0));
+        else if (sublist2.size() > 0)
+			workingList.add(sublist2.get(0));
 
-		int flag1 = 0, flag2 = 0;
+		/*int flag1 = 0, flag2 = 0;
 		List<Node> result = new ArrayList<Node>();
 		for (int i = 0; i < current.size(); i++) {
 			boolean existed = false;
@@ -527,6 +538,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		}
 
 		workingList = result;
+        */
 		return workingList;
 	}
 	
@@ -601,7 +613,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq5(XqueryParser.Xq5Context ctx) { 
-		System.out.println("Xq 5");
+//		System.out.println("Xq 5");
         List<Node> result = new ArrayList<Node>();
         List<Node> tmp;
         tmp = visit(ctx.xq());
@@ -739,17 +751,24 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
             }
 
 //		    workingList = tmpResult;
-		    workingList = new ArrayList<Node>(Arrays.asList(vars.get(key).get(i)));
-            workingList = visit(ctx.returnClause());
             if(tmpResult != null && tmpResult.size() > 0){
+		        workingList = new ArrayList<Node>(Arrays.asList(vars.get(key).get(i)));
+                workingList = visit(ctx.returnClause());
                 myResult.addAll(workingList);
+                pass += 1;
+	            System.out.println("where tempResult pass " + pass);
             }
     	}
+        while(myDocNum < docNum){
+            closeXMLFile();
+            docNum -= 1;
+        }
 		return myResult;
 	}
 
     @Override
 	public List<Node> visitIn1(XqueryParser.In1Context ctx) {
+        int myDocNum = docNum;
         List<Node> myResult = new ArrayList<Node>();
         List<Node> tmpResult = new ArrayList<Node>();
         List<Node> totalWork = visit(ctx.xq());
@@ -770,6 +789,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 }
             }
 		}
+        while(myDocNum < docNum){
+            closeXMLFile();
+            docNum -= 1;
+        }
 		return myResult;
 	}
 	
@@ -841,7 +864,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) {
-		System.out.println("In cond0!!");
+//		System.out.println("In cond0!!");
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
 
@@ -1022,14 +1045,17 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		List<Node> sublist2 = visit(ctx.getChild(2));
 
 		workingList = new ArrayList<Node>();
-		for (int i = 0; i < sublist1.size(); i++) {
+		if (sublist1.size() > 0 && sublist2.size() > 0) {
+			workingList.add(sublist1.get(0));
+        }
+		/*for (int i = 0; i < sublist1.size(); i++) {
 			for (int j = 0; j < sublist2.size(); j++) {
 				if (sublist1.get(i) == sublist2.get(j)) {
 					workingList.add(sublist1.get(i));
 					break;
 				}
 			}
-		}
+		}*/
 
 		return workingList;
 	}
@@ -1042,8 +1068,14 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = current;
 
 		List<Node> sublist2 = visit(ctx.getChild(2));
+		
+		workingList = new ArrayList<Node>();
+        if (sublist1.size() > 0)
+			workingList.add(sublist1.get(0));
+        else if (sublist2.size() > 0)
+			workingList.add(sublist2.get(0));
 
-		for (int i = 0; i < sublist1.size(); i++) {
+		/*for (int i = 0; i < sublist1.size(); i++) {
 			boolean seen = false;
 			for (int j = 0; j < sublist2.size(); j++) {
 				if (sublist1.get(i) == sublist2.get(j)) {
@@ -1054,7 +1086,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 
 			if (!seen)
 				sublist2.add(sublist1.get(i));
-		}
+		}*/
 
 		workingList = sublist2;
 		return workingList;
