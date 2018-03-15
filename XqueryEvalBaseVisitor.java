@@ -203,15 +203,20 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         List<Node> result = new ArrayList<Node>();
         List<Node> tmp;
         tmp = visit(ctx.rp(0));
-		//System.out.println(tmp.size() + " RP7");
+        //if(tmp.size() > 0)
+    	//	System.out.println(tmp.size() + " left RP7");
 		//System.out.println(workingList.size() + " RP7&&");
         tmp = visit(ctx.rp(1));
+        //if(tmp.size() > 0)
+    	//	System.out.println(tmp.size() + " right RP7");
 
 		int seen = 0;
         for(Node e : tmp){
             seen = 0;
             for(Node n : result){
-                if(isEqual(e,n)){
+                //if(isEqual(e,n)){
+                if(e == n){
+		            //System.out.println("isEqual");
                     seen = 1;
                     break;
                 }
@@ -220,6 +225,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 result.add(e);
         }
 		//System.out.println(result.size() + " QQ");
+        //if(result.size() > 0)
+    	//	System.out.println(result.size() + " unique RP7");
 
 		workingList = result;
 		return result;
@@ -246,7 +253,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
             for(Node e : possible){
                 seen = 0;
                 for(Node n : result){
-                    if(isEqual(e,n)){
+                    //if(isEqual(e,n)){
+                    if(e == n){
                         seen = 1;
                         break;
                     }
@@ -344,10 +352,12 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		NodeList children1 = node1.getChildNodes();
 		NodeList children2 = node2.getChildNodes();
 		for (int i = 0; i < len; i++) {
-			if (!children1.item(i).getTextContent().equals(children2.item(i).getTextContent())
-					|| (children1.item(i).getNodeType() == Node.ELEMENT_NODE && children2.item(i).getNodeType() == Node.ELEMENT_NODE && !((Element) children1.item(i)).getTagName().equals(((Element) children2.item(i)).getTagName()))
-					|| !(children1.item(i).getChildNodes().getLength() == children2.item(i).getChildNodes().getLength()))
-				return false;
+                if(!isEqual(children1.item(i), children2.item(i)))
+                    return false;
+//			if (!children1.item(i).getTextContent().equals(children2.item(i).getTextContent())
+//					|| (children1.item(i).getNodeType() == Node.ELEMENT_NODE && children2.item(i).getNodeType() == Node.ELEMENT_NODE && !((Element) children1.item(i)).getTagName().equals(((Element) children2.item(i)).getTagName()))
+//					|| !(children1.item(i).getChildNodes().getLength() == children2.item(i).getChildNodes().getLength()))
+//				return false;
 		}
 		return true;
 	}
@@ -623,7 +633,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
         for(Node e : tmp){
             seen = 0;
             for(Node n : result){
-                if(isEqual(e,n)){
+                //if(isEqual(e,n)){
+                if(e == n){
                     seen = 1;
                     break;
                 }
@@ -638,12 +649,13 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitXq6(XqueryParser.Xq6Context ctx) { 
-		System.out.println("Xq 6");
+		//System.out.println("Xq 6");
         List<Node> result = new ArrayList<Node>();
         int queue = 0, seen = 0;
         List<Node> BFS;
         List<Node> possible;
         BFS = visit(ctx.xq());
+    	//System.out.println("BFS size " + BFS.size());
         while(queue < BFS.size()){
             Node now = BFS.get(queue);
             //workingList.clear();
@@ -657,7 +669,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
             for(Node e : possible){
                 seen = 0;
                 for(Node n : result){
-                    if(isEqual(e,n)){
+                    if(e == n){
                         seen = 1;
                         break;
                     }
@@ -665,11 +677,12 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 if(seen != 1)
                     result.add(e);
             }
+    		//if(possible.size() > 0)
+            //    System.out.println("BFS size " + BFS.size() + " possible "+possible.size()+" result "+result.size());
             queue += 1;
         }
         workingList = result;
 		return result; 
-
 	}
 	
 	@Override 
@@ -733,6 +746,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		vars.put(key, totalWork);
 		flags.put(key, 0);
 	    //System.out.println("in1 " + vars.get(key).size());
+		//System.out.println("in1 " + key + " total size" + vars.get(key).size());
 
 	    for (int i = 0; i < vars.get(key).size(); i++) {
 	    	//System.out.println( vars.get(key).get(i).getTextContent());
@@ -756,7 +770,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
                 workingList = visit(ctx.returnClause());
                 myResult.addAll(workingList);
                 pass += 1;
-	            System.out.println("where tempResult pass " + pass);
+	            //System.out.println("where tempResult pass " + pass);
             }
     	}
         while(myDocNum < docNum){
@@ -776,11 +790,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		String key = ctx.Var().getText();
 		vars.put(key, totalWork);
 		flags.put(key, 0);
-		System.out.println("in1 " + key);
-		System.out.println("in1 " + vars.get(key).size());
+		System.out.println("in1 " + key + " total size" + vars.get(key).size());
 		for (int i = 0; i < vars.get(key).size(); i++) {
 			flags.put(key, i);
 //            workingList = myList;
+		    System.out.println("in1 " + key + " now in " + i);
 		    workingList = new ArrayList<Node>(Arrays.asList(vars.get(key).get(flags.get(key))));
 			tmpResult = visit(ctx.inClause());
             if(tmpResult != null){
@@ -864,7 +878,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	
 	@Override 
 	public List<Node> visitCond0(XqueryParser.Cond0Context ctx) {
-//		System.out.println("In cond0!!");
+		//System.out.println("In cond0!!");
 		List<Node> current = workingList;
 		List<Node> result = new ArrayList<Node>();
 
@@ -872,11 +886,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 			List<Node> tempCurrent = new ArrayList<Node>(Arrays.asList(current.get(i)));
 			workingList = tempCurrent;
 			List<Node> sublist1 = visit(ctx.getChild(0));
-//			System.out.println(sublist1.size() + " ~~ " + sublist1.get(0).getTextContent());
 			workingList = tempCurrent;
 			List<Node> sublist2 = visit(ctx.getChild(2));
-//			System.out.println(sublist2.size() + " ~~~ " + sublist2.get(0).getTextContent());
-
 			boolean pass = false;
 			for (int j = 0; j < sublist1.size(); j++) {
 				for (int k = 0; k < sublist2.size(); k++) {
