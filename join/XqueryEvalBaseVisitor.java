@@ -46,7 +46,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
         ArrayList<ArrayList<Integer>> union = new ArrayList<ArrayList<Integer>>();
         union.add(new ArrayList<Integer>());
         for(int j = 0; j < forVarList.size(); j++)
-            tupleGroup.add(0);
+            tupleGroup.add(-1);
 
         while(i != condLeftVar.size()){
             for(i = 0; i < condLeftVar.size(); i++){
@@ -220,16 +220,17 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
             //maybe need where
             s+="return ";
         }
-        try{
+
+	    s += visit(ctx.returnClause());
+
+	    try{
         	System.out.println(s);
             output.write(s);
         }
         catch(Exception ex){
 
         }
-        a = visit(ctx.returnClause());   
- 
-        return a; 
+        return s;
     }
 
 	@Override
@@ -323,23 +324,54 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
 	}
 	
 	@Override 
-	public String visitRe0(XqueryParser.Re0Context ctx) { 
-		return visitChildren(ctx); 
+	public String visitRe0(XqueryParser.Re0Context ctx) {
+    	String result = "";
+    	String var = ctx.Var().getText();
+    	int tupleNum = tupleGroup.get(varGroups.get(var));
+
+		if (tupleNum == -1) {
+			result = var;
+		}
+		else {
+			result = "$tuple" + tupleNum + "/" + var.substring(1) + "/*";
+		}
+
+		return result;
 	}
 	
 	@Override 
-	public String visitRe1(XqueryParser.Re1Context ctx) { 
-		return visitChildren(ctx); 
+	public String visitRe1(XqueryParser.Re1Context ctx) {
+    	String result = "";
+    	result += visit(ctx.returnClause(0));
+		result += " , ";
+		result += visit(ctx.returnClause(1));
+		return result;
 	}
 
 	@Override
 	public String visitRe2(XqueryParser.Re2Context ctx) {
-		return visitChildren(ctx);
+    	String result = "";
+		result = result + "<" + ctx.TagName(0).getText() + "> { ";
+		result += visit(ctx.returnClause());
+		result = result + " } </" + ctx.TagName(1).getText() + ">";
+		return result;
 	}
 
 	@Override
 	public String visitRe3(XqueryParser.Re3Context ctx) {
-		return visitChildren(ctx);
+    	String path = visit(ctx.path());
+		String var = path.substring(0, path.indexOf('/'));
+		String result = "";
+		int tupleNum = tupleGroup.get(varGroups.get(var));
+
+		if (tupleNum == -1) {
+			result = path;
+		}
+		else {
+			result = "$tuple" + tupleNum + "/" + var.substring(1) + "/*" + path.substring(path.indexOf("/"));
+		}
+
+		return result;
 	}
 
 	@Override
