@@ -345,7 +345,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	boolean isEqual(Node node1, Node node2) {
 		if (!node1.getTextContent().equals(node2.getTextContent())
 				|| (node1.getNodeType() == Node.ELEMENT_NODE && node2.getNodeType() == Node.ELEMENT_NODE && !((Element) node1).getTagName().equals(((Element) node2).getTagName()))
-				|| !(node1.getChildNodes().getLength() == node2.getChildNodes().getLength()))
+				|| (node1.getChildNodes().getLength() != node2.getChildNodes().getLength()))
 			return false;
 
 		int len = node1.getChildNodes().getLength();
@@ -689,16 +689,16 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 	public List<Node> visitXq7(XqueryParser.Xq7Context ctx) { 
 		List<Node> children = visit(ctx.xq());
 		//Node parentNode = doc.createElement(ctx.TagName(0).getText());
-        System.out.println("In Xq7: docNum = "+docNum);
+//        System.out.println("In Xq7: docNum = "+docNum);
 		Node parentNode = (doc.get(0)).createElement(ctx.TagName(0).getText());
-        System.out.println("In Xq7: docNum = "+docNum);
+//        System.out.println("In Xq7: docNum = "+docNum);
 		for (int i = 0; i < children.size(); i++) {
             Node child = (doc.get(0)).importNode((children.get(i)),true);
-            System.out.println("In Xq7 "+i+ ": docNum = "+docNum);
+//            System.out.println("In Xq7 "+i+ ": docNum = "+docNum);
 			//parentNode.appendChild(children.get(i).cloneNode(true));
 			parentNode.appendChild(child);
 		}
-        System.out.println("In Xq7: docNum = "+docNum);
+//        System.out.println("In Xq7: docNum = "+docNum);
 
 		workingList = new ArrayList<Node>(Arrays.asList(parentNode));
 		return workingList;
@@ -745,43 +745,101 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		workingList = current;
 		List<Node> list2 = visit(ctx.xq(1));
 
+//		for (int i = 0; i < list1.size(); i++) {
+//			if (list1.get(i).getNodeType() == Element.ELEMENT_NODE) {
+//				System.out.println(((Element)list1.get(i)).getTagName() + "=====");
+//				int childrenLen = ((Element)list1.get(i)).getChildNodes().getLength();
+//				for (int j = 0; j < childrenLen; j++)
+//					System.out.println(((Element)((Element)list1.get(i)).getChildNodes().item(j)).getTagName());
+//			}
+//			else
+//				System.out.println(list1.get(i).getTextContent() + "-----");
+//		}
 		System.out.println("list1 length " + list1.size() + " list2 length " + list2.size());
-		// use hash join to compare two sets of attributes
+//		for (int i = 0; i < list2.size(); i++) {
+//			if (list2.get(i).getNodeType() == Element.ELEMENT_NODE) {
+//				System.out.println(((Element)list2.get(i)).getTagName() + "=====");
+//				int childrenLen = ((Element)list2.get(i)).getChildNodes().getLength();
+//				for (int j = 0; j < childrenLen; j++) {
+////					System.out.println(((Element)((Element)list2.get(i)).getChildNodes().item(j)).getTagName());
+//					System.out.println(((Element)((Element)list2.get(i)).getChildNodes().item(j)).getTextContent());
+//				}
+//			}
+//			else
+//				System.out.println(list2.get(i).getTextContent() + "-----");
+//		}
+
+
 		List<Node> result = new ArrayList<Node>();
 		int attrLen = ctx.TagName().size() / 2;
-		HashMap<String, List<Node>> nodeMap = new HashMap<String, List<Node>>();
 
-		// use list1 to build hash map
-		for (Node node : list1) {
-			String key1 = "";
-			for (int i = 0; i < attrLen; i++) {
-				key1 += ((Element)node).getElementsByTagName(ctx.TagName(i).getText()).item(0).getTextContent();
+		for (int i = 0; i < list1.size(); i++) {
+			for (int j = 0; j < list2.size(); j++) {
+				boolean matched = true;
+
+				for (int k = 0; k < attrLen; k++) {
+					NodeList children1 = ((Element)list1.get(i)).getElementsByTagName(ctx.TagName(k).getText()).item(0).getChildNodes();
+					NodeList children2 = ((Element)list2.get(j)).getElementsByTagName(ctx.TagName(k + attrLen).getText()).item(0).getChildNodes();
+
+					if (children1.getLength() != children2.getLength()) {
+						matched = false;
+						break;
+					}
+					else {
+						int childrenLen = children1.getLength();
+						for (int m = 0; m < childrenLen; m++) {
+							if (!isEqual(children1.item(m), children2.item(m))) {
+								matched = false;
+								break;
+							}
+						}
+					}
+				}
+
+				if (matched) {
+					Node temp = list1.get(i).cloneNode(true);
+					int childrenLen = list2.get(j).getChildNodes().getLength();
+					for (int k = 0; k < childrenLen; k++)
+						temp.appendChild(list2.get(j).getChildNodes().item(k).cloneNode(true));
+					result.add(temp);
+				}
 			}
-			System.out.println("key1 " + key1);
-			nodeMap.putIfAbsent(key1, new ArrayList<Node>());
-			nodeMap.get(key1).add(node);
 		}
-		System.out.println("hashmap size " + nodeMap.size());
 
-		// traverse list2
-		for (Node node : list2) {
-			String key2 = "";
-			for (int i = 0; i < attrLen; i++) {
-				key2 += ((Element)node).getElementsByTagName(ctx.TagName(i + attrLen).getText()).item(0).getTextContent();
-			}
-			System.out.println("key2 " + key2);
-
-			List<Node> matched = nodeMap.getOrDefault(key2, new ArrayList<Node>());
-			System.out.println("matched " + matched.size());
-
-			for (Node matchedNode : matched) {
-				int childrenLen = node.getChildNodes().getLength();
-				System.out.println("childLen " + childrenLen);
-				for (int i = 0; i < childrenLen; i++)
-					matchedNode.appendChild(node.getChildNodes().item(i).cloneNode(true));
-				result.add(matchedNode);
-			}
-		}
+//		// use hash join to compare two sets of attributes
+//		HashMap<String, List<Node>> nodeMap = new HashMap<String, List<Node>>();
+//
+//		// use list1 to build hash map
+//		for (Node node : list1) {
+//			String key1 = "";
+//			for (int i = 0; i < attrLen; i++) {
+//				key1 += ((Element)node).getElementsByTagName(ctx.TagName(i).getText()).item(0).getTextContent();
+//			}
+//			System.out.println("key1 " + key1);
+//			nodeMap.putIfAbsent(key1, new ArrayList<Node>());
+//			nodeMap.get(key1).add(node);
+//		}
+//		System.out.println("hashmap size " + nodeMap.size());
+//
+//		// traverse list2
+//		for (Node node : list2) {
+//			String key2 = "";
+//			for (int i = 0; i < attrLen; i++) {
+//				key2 += ((Element)node).getElementsByTagName(ctx.TagName(i + attrLen).getText()).item(0).getTextContent();
+//			}
+//			System.out.println("key2 " + key2);
+//
+//			List<Node> matched = nodeMap.getOrDefault(key2, new ArrayList<Node>());
+//			System.out.println("matched " + matched.size());
+//
+//			for (Node matchedNode : matched) {
+//				int childrenLen = node.getChildNodes().getLength();
+//				System.out.println("childLen " + childrenLen);
+//				for (int i = 0; i < childrenLen; i++)
+//					matchedNode.appendChild(node.getChildNodes().item(i).cloneNode(true));
+//				result.add(matchedNode);
+//			}
+//		}
 
 		workingList = result;
 		return workingList;

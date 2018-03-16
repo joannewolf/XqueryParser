@@ -33,9 +33,9 @@ xq  : Var                                               #xq0
     | StringConstant                                    #xq1
     | ap                                                #xq2
     | '(' xq ')'                                        #xq3
-    | xq ',' xq                                         #xq4
     | xq '/' rp                                         #xq5
     | xq '//' rp                                        #xq6
+    | xq ',' xq                                         #xq4
     | '<' TagName '>''{' xq '}''<''/' TagName '>'       #xq7
     | 'for' inClause                                    #xq8
     | letClause xq                                      #xq9
