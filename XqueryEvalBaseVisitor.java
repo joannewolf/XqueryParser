@@ -735,6 +735,58 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		return workingList;
 	}
 
+	@Override
+	public List<Node> visitXqJoin(XqueryParser.XqJoinContext ctx) {
+		System.out.println("In Join~~");
+
+		List<Node> current = workingList;
+		// get two tuples
+		List<Node> list1 = visit(ctx.xq(0));
+		workingList = current;
+		List<Node> list2 = visit(ctx.xq(1));
+
+		System.out.println("list1 length " + list1.size() + " list2 length " + list2.size());
+		// use hash join to compare two sets of attributes
+		List<Node> result = new ArrayList<Node>();
+		int attrLen = ctx.TagName().size() / 2;
+		HashMap<String, List<Node>> nodeMap = new HashMap<String, List<Node>>();
+
+		// use list1 to build hash map
+		for (Node node : list1) {
+			String key1 = "";
+			for (int i = 0; i < attrLen; i++) {
+				key1 += ((Element)node).getElementsByTagName(ctx.TagName(i).getText()).item(0).getTextContent();
+			}
+			System.out.println("key1 " + key1);
+			nodeMap.putIfAbsent(key1, new ArrayList<Node>());
+			nodeMap.get(key1).add(node);
+		}
+		System.out.println("hashmap size " + nodeMap.size());
+
+		// traverse list2
+		for (Node node : list2) {
+			String key2 = "";
+			for (int i = 0; i < attrLen; i++) {
+				key2 += ((Element)node).getElementsByTagName(ctx.TagName(i + attrLen).getText()).item(0).getTextContent();
+			}
+			System.out.println("key2 " + key2);
+
+			List<Node> matched = nodeMap.getOrDefault(key2, new ArrayList<Node>());
+			System.out.println("matched " + matched.size());
+
+			for (Node matchedNode : matched) {
+				int childrenLen = node.getChildNodes().getLength();
+				System.out.println("childLen " + childrenLen);
+				for (int i = 0; i < childrenLen; i++)
+					matchedNode.appendChild(node.getChildNodes().item(i).cloneNode(true));
+				result.add(matchedNode);
+			}
+		}
+
+		workingList = result;
+		return workingList;
+	}
+
     @Override
 	public List<Node> visitIn0(XqueryParser.In0Context ctx) {
         int myDocNum = docNum;
@@ -746,10 +798,10 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
 		vars.put(key, totalWork);
 		flags.put(key, 0);
 	    //System.out.println("in1 " + vars.get(key).size());
-		//System.out.println("in1 " + key + " total size" + vars.get(key).size());
+		System.out.println("in0 " + key + " total size" + vars.get(key).size());
 
 	    for (int i = 0; i < vars.get(key).size(); i++) {
-	    	//System.out.println( vars.get(key).get(i).getTextContent());
+	    	System.out.println( vars.get(key).get(i).getTextContent());
 			flags.put(key, i);
 
 			try{
@@ -765,7 +817,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<List<Node>> {
             }
 
 //		    workingList = tmpResult;
-            if(tmpResult != null && tmpResult.size() > 0){
+//		    if(tmpResult != null && tmpResult.size() > 0){
+		    if(workingList != null && workingList.size() > 0){
 		        workingList = new ArrayList<Node>(Arrays.asList(vars.get(key).get(i)));
                 workingList = visit(ctx.returnClause());
                 myResult.addAll(workingList);

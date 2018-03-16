@@ -39,6 +39,7 @@ xq  : Var                                               #xq0
     | '<' TagName '>''{' xq '}''<''/' TagName '>'       #xq7
     | 'for' inClause                                    #xq8
     | letClause xq                                      #xq9
+    | 'join' '(' xq ',' xq ',' '[' TagName (',' TagName)* ']' ',' '[' TagName (',' TagName)* ']' ')'  #xqJoin
     ;
 
 inClause    : Var 'in' xq letClause? whereClause? returnClause  #in0
@@ -67,7 +68,7 @@ someInClause    : Var 'in' xq 'satisfies' cond          #soin0
 				| Var 'in' xq ',' someInClause          #soin1
 				;
 
-TagName : [a-zA-Z0-9]+;
+TagName : [-a-zA-Z0-9]+;
 
 Var : '$'[_.a-zA-Z0-9]+;
 
