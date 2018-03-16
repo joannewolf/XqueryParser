@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
-import java.util.List;
 
 public class Main {
 	public static final String expression = "for $b1 in doc(\"input.xml\")/book,\n"+
