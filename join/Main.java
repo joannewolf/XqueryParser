@@ -12,26 +12,26 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 public class Main {
-	public static final String expression = "for $b1 in doc(\"input.xml\")/book,\n"+
-		"$aj in $b1/author/first/text(),\n"+
-		"$a1 in $b1/author,\n"+
-		"$af1 in $a1/first,\n"+
-		"$al1 in $a1/last,\n"+
-		"$b2 in doc(\"input.xml\")/book,\n"+
-		"$a21 in $b2/author,\n"+
-		"$af21 in $a21/first,\n"+
-		"$al21 in $a21/last,\n"+
-		"$a22 in $b2/author,\n"+
-		"$af22 in $a22/first,\n"+
-		"$al22 in $a22/last,\n"+
-		"$b3 in doc(\"input.xml\")/book,\n"+
-		"$a3 in $b3/author,\n"+
-		"$af3 in $a3/first,\n"+
-		"$al3 in $a3/last\n"+
-		"where $aj eq \"John\" and\n"+
-		"$af1 eq $af21 and $al1 eq $al21 and\n"+
-		"$af22 eq $af3 and $al22 eq $al3\n"+
-		"return <triplet> {$b1, $b2, $b3} </triplet>";
+	public static final String expression = "for $b1 in doc(\"book.xml\")/book,\n" +
+			"$aj in $b1/author/first/text(),\n" +
+			"$a1 in $b1/author,\n" +
+			"$af1 in $a1/first,\n" +
+			"$al1 in $a1/last,\n" +
+			"$b2 in doc(\"book.xml\")/book,\n" +
+			"$a21 in $b2/author,\n" +
+			"$af21 in $a21/first,\n" +
+			"$al21 in $a21/last,\n" +
+			"$a22 in $b2/author,\n" +
+			"$af22 in $a22/first,\n" +
+			"$al22 in $a22/last,\n" +
+			"$b3 in doc(\"book.xml\")/book,\n" +
+			"$a3 in $b3/author,\n" +
+			"$af3 in $a3/first,\n" +
+			"$al3 in $a3/last\n" +
+			"where $aj eq \"John\" and\n" +
+			"$af1 eq $af21 and $al1 eq $al21 and\n" +
+			"$af22 eq $af3 and $al22 eq $al3\n" +
+			"return <triplet> {$b1, $b2, $b3} </triplet>";
 
 	public static void printXML(Node node) {
 		try	{
@@ -78,5 +78,6 @@ public class Main {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("end!!");
 	}
 }
