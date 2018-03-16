@@ -154,7 +154,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                 TreeNode n = forVarList.get(union.get(t).get(0)).get(i);
                 String tag = n.name.substring(1);
                 s += "<"+tag+">{"+n.name+"}</"+tag+">";
-                if(i != forVarList.get(0).size()-1)
+                if(i != forVarList.get(union.get(t).get(0)).size()-1)
                     s += ",";
                 s+='\n';
             }
@@ -224,35 +224,40 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                     s+=",";
                 s+="\n";
             }
-            //if alone
-            for(i = 0; i < tupleGroup.size(); i++){
-                if(tupleGroup.get(i) == -1){
-                    s += ",";
-                    for(int j = 0; j < forVarList.get(i).size(); j++){
-                        TreeNode n = forVarList.get(i).get(j);
-                        if(j != forVarList.get(i).size()-1)
-                            s+=n.name + " in " + n.path + ",\n";
-                        else
-                            s+=n.name + " in " + n.path + "\n";
-                    }
-                }
-            }
-            //maybe need where
-            whereFlag = 0;
-            for(i = 0; i < condLeftGroup.size(); i++){
-                if(condUsed.get(i) == -1){
-                    if(whereFlag == 0)
-                        s += "where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
-                    else
-                        s += "and "+condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
 
-                }
-            }
-            if(whereFlag > 0)
-                s+="\n";
-
-            s+="return ";
         }
+	    //if alone
+	    boolean first = true;
+	    for(i = 0; i < tupleGroup.size(); i++){
+		    if(tupleGroup.get(i) == -1){
+			    s += ",";
+			    for(int j = 0; j < forVarList.get(i).size(); j++){
+				    TreeNode n = forVarList.get(i).get(j);
+				    if(first) {
+					    s += n.name + " in " + n.path + "\n";
+						first = false;
+				    }
+				    else
+					    s += "," + n.name + " in " + n.path + "\n";
+			    }
+		    }
+	    }
+	    //maybe need where
+	    int whereFlag = 0;
+	    for(i = 0; i < condLeftGroup.size(); i++){
+		    if(condUsed.get(i) == -1){
+			    if(whereFlag == 0)
+				    s += "where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+			    else
+				    s += "and "+condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+
+		    }
+	    }
+	    if(whereFlag > 0)
+		    s+="\n";
+
+	    s+="return ";
+
 	    s += visit(ctx.returnClause());
         try{
         	System.out.println(s);
