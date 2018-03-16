@@ -13,6 +13,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
     List<Integer> condLeftGroup;
     List<Integer> condRightGroup;
     List<Integer> condUsed;
+    List<Integer> tupleGroup;
     ArrayList<ArrayList<TreeNode>> forVarList;
     HashMap<String, Integer> varGroups;
     Writer output;
@@ -23,6 +24,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
         condLeftGroup = new ArrayList<Integer>();
         condRightGroup = new ArrayList<Integer>();
         condUsed = new ArrayList<Integer>();
+        tupleGroup = new ArrayList<Integer>();
         forVarList = new ArrayList<ArrayList<TreeNode>>();
         varGroups = new HashMap<String, Integer>();
         try{
@@ -35,152 +37,189 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
     @Override public String visitXq(XqueryParser.XqContext ctx) {
         String a = visit(ctx.getChild(1));
         a = visit(ctx.getChild(3));
-        int layer = 0, now = 0;
-        int i = 0;
+        int layer = 0, now = 0, arranged = 0;
+        List<Integer> layers = new ArrayList<Integer>();
+        int i = 0, tupleNum = 0;
         int printed = 0;
         String s = "";
-        for(i = 0; i < condLeftVar.size(); i++)
-            System.out.println("left "+condLeftGroup.get(i)+" right "+condRightGroup.get(i));
-        i = 0;
         //check for the where condtion
-        List<Integer> union = new ArrayList<Integer>();
+        ArrayList<ArrayList<Integer>> union = new ArrayList<ArrayList<Integer>>();
+        union.add(new ArrayList<Integer>());
+        for(int j = 0; j < forVarList.size(); j++)
+            tupleGroup.add(0);
 
         while(i != condLeftVar.size()){
-
             for(i = 0; i < condLeftVar.size(); i++){
                 if(condUsed.get(i) != -1)
                     continue;      
-                if(!union.contains(condLeftGroup.get(i)) && condLeftGroup.get(i) != -1 && union.size() == 0)
+                if(!union.get(tupleNum).contains(condLeftGroup.get(i)) && condLeftGroup.get(i) != -1 && union.get(tupleNum).size() == 0)
                     break;
-                if(union.contains(condLeftGroup.get(i)))
+                if(union.get(tupleNum).contains(condLeftGroup.get(i)))
                     break;
             }
-            System.out.println("i" + i);
             if(i != condLeftVar.size()){
-                if(union.size() == 0){ 
-                    union.add(condLeftGroup.get(i));
+                if(union.get(tupleNum).size() == 0){ 
+                    union.get(tupleNum).add(condLeftGroup.get(i));
+                    tupleGroup.set(condLeftGroup.get(i), tupleNum);
                 }
                 now = condRightGroup.get(i);
+                tupleGroup.set(now, tupleNum);
 
                 for(int j = 0; j < condLeftVar.size(); j++){
-                    if(union.contains(condLeftGroup.get(j)) && condRightGroup.get(j) == now) {
-	                    condUsed.set(j, layer);
+                    if(union.get(tupleNum).contains(condLeftGroup.get(j)) && condRightGroup.get(j) == now) {
+	                    condUsed.set(j, tupleNum);
+                        arranged += 1;
                     }
-                    if(condLeftGroup.get(j) == -1 && condRightGroup.get(j) == now)
-                        condUsed.set(j, layer);
+                    if(condLeftGroup.get(j) == -1 && condRightGroup.get(j) == now) {
+                        condUsed.set(j, tupleNum);
+                        arranged += 1;
+                    }
                 }
-	            union.add(now);
+	            union.get(tupleNum).add(now);
+                layer += 1;
             }
-            layer += 1;
+            else if(arranged != condLeftVar.size()-1){
+                boolean finish = true;
+                layer += 1;
+                for(int j = 0; j < condLeftVar.size(); j++)
+                    if(condUsed.get(j) != -1 && condLeftGroup.get(j) != -1)
+                        finish = false;
+                if(!finish){
+                    union.add(new ArrayList<Integer>());
+                    tupleNum += 1;
+                    layers.add(layer);
+                    layer = 0;
+                    i = 0;
+                }
+                else{
+                    layers.add(layer);
+                    tupleNum += 1;
+                }
+            }
+            else{
+                layer += 1;
+                layers.add(layer);
+                tupleNum += 1;
+            }
+            System.out.println("arranged "+arranged);
+            
         }
 
-        System.out.println("union size " + union.size());
+        System.out.println("tuple size " + union.size());
+        System.out.println("tuple Number " + tupleNum);
 	    System.out.println("left size " + condLeftVar.size());
 	    System.out.println("right size " + condRightVar.size());
 
 	    //print
         //s+="for $tuple in join(");
-        s += "for $tuple in join(";
-        for(i = 2; i < layer; i++)
-            s += "\njoin (";
-        //for X in path, ....
         s += "for ";
-        for(i = 0; i < forVarList.get(0).size(); i++){
-            TreeNode n = forVarList.get(0).get(i);
-            if(i != forVarList.get(0).size()-1)
-                s += n.name + " in " + n.path + ",\n";
-            else
-                s += n.name + " in " + n.path + "\n";
-        }
-        //where?
-        int whereFlag = 0;
-        for(i = 0; i < condLeftVar.size(); i++)
-            if(condLeftGroup.get(i) == -1 && condRightGroup.get(i) == union.get(0)){
-                if(whereFlag == 0)
-                    s += "where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
-                else
-                    s += "and "+condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
-                whereFlag += 1;
-            }
-        if(whereFlag > 0)
-            s += "\n";
-        //return
-        s += "return <tuple>{\n";
-        for(i = 0; i < forVarList.get(0).size(); i++){
-            TreeNode n = forVarList.get(0).get(i);
-            String tag = n.name.substring(1);
-            s += "<"+tag+">{"+n.name+"}</"+tag+">";
-            if(i != forVarList.get(0).size()-1)
-                s += ",";
-            s+='\n';
-        }
-        s+="}</tuple>,\n\n";
-
-        for(int j = 1; j < union.size(); j++){
+        for(int t = 0; t < tupleNum; t++){
+            s += "$tuple"+t+" in join(";
+            for(i = 2; i < layers.get(t); i++)
+                s += "\njoin (";
             //for X in path, ....
-            s+="for ";
-            for(i = 0; i < forVarList.get(j).size(); i++){
-                TreeNode n = forVarList.get(j).get(i);
-                if(i != forVarList.get(j).size()-1)
-                    s+=n.name + " in " + n.path + ",\n";
+            s += "for ";
+            for(i = 0; i < forVarList.get(union.get(t).get(0)).size(); i++){
+                TreeNode n = forVarList.get(union.get(t).get(0)).get(i);
+                if(i != forVarList.get(union.get(t).get(0)).size()-1)
+                    s += n.name + " in " + n.path + ",\n";
                 else
-                    s+=n.name + " in " + n.path + "\n";
+                    s += n.name + " in " + n.path + "\n";
             }
             //where?
-            whereFlag = 0;
-            System.out.println("j "+union.get(j));
-            for(i = 0; i < condLeftVar.size(); i++){
-                System.out.println("left "+condLeftGroup.get(i)+" right "+condRightGroup.get(i));
-                if(condLeftGroup.get(i) == -1 && condRightGroup.get(i) == union.get(j)){
+            int whereFlag = 0;
+            for(i = 0; i < condLeftVar.size(); i++)
+                if(condLeftGroup.get(i) == -1 && condRightGroup.get(i) == union.get(t).get(0)){
                     if(whereFlag == 0)
-                        s+="where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+                        s += "where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
                     else
-                        s+=condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+                        s += "and "+condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
                     whereFlag += 1;
                 }
-            }
             if(whereFlag > 0)
-                s+="\n";
+                s += "\n";
             //return
-            s+="return <tuple>{\n";
-            for(i = 0; i < forVarList.get(j).size(); i++){
-                TreeNode n = forVarList.get(j).get(i);
+            s += "return <tuple>{\n";
+            for(i = 0; i < forVarList.get(union.get(t).get(0)).size(); i++){
+                TreeNode n = forVarList.get(union.get(t).get(0)).get(i);
                 String tag = n.name.substring(1);
-                s+="<"+tag+">{"+n.name+"}</"+tag+">";
-                if(i != forVarList.get(j).size()-1)
-                    s+=",";
+                s += "<"+tag+">{"+n.name+"}</"+tag+">";
+                if(i != forVarList.get(0).size()-1)
+                    s += ",";
                 s+='\n';
             }
-            s+="}</tuple>,\n";
-            s+="[";
-            printed = 0;
-            for(i = 0; i < condLeftVar.size(); i++){
-                if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
-                    if(printed != 0)
-                        s += ", ";
-                    String tag = condLeftVar.get(i).substring(1);
-                    s += tag;
-                    printed += 1;
+            s+="}</tuple>,\n\n";
+    
+            for(int j = 1; j < union.get(t).size(); j++){
+                //for X in path, ....
+                s+="for ";
+                for(i = 0; i < forVarList.get(union.get(t).get(j)).size(); i++){
+                    TreeNode n = forVarList.get(union.get(t).get(j)).get(i);
+                    if(i != forVarList.get(union.get(t).get(j)).size()-1)
+                        s+=n.name + " in " + n.path + ",\n";
+                    else
+                        s+=n.name + " in " + n.path + "\n";
                 }
-            }
-            s += "], [";
-            printed = 0;
-            for(i = 0; i < condLeftVar.size(); i++){
-                if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
-                    if(printed != 0)
-                        s += ", ";
-                    String tag = condRightVar.get(i).substring(1);
-                    s += tag;
-                    printed += 1;
+                //where?
+                whereFlag = 0;
+                System.out.println("j "+union.get(t).get(j));
+                for(i = 0; i < condLeftVar.size(); i++){
+                    System.out.println("left "+condLeftGroup.get(i)+" right "+condRightGroup.get(i));
+                    if(condLeftGroup.get(i) == -1 && condRightGroup.get(i) == union.get(t).get(j)){
+                        if(whereFlag == 0)
+                            s+="where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+                        else
+                            s+=condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
+                        whereFlag += 1;
+                    }
                 }
+                if(whereFlag > 0)
+                    s+="\n";
+                //return
+                s+="return <tuple>{\n";
+                for(i = 0; i < forVarList.get(union.get(t).get(j)).size(); i++){
+                    TreeNode n = forVarList.get(union.get(t).get(j)).get(i);
+                    String tag = n.name.substring(1);
+                    s+="<"+tag+">{"+n.name+"}</"+tag+">";
+                    if(i != forVarList.get(union.get(t).get(j)).size()-1)
+                        s+=",";
+                    s+='\n';
+                }
+                s+="}</tuple>,\n";
+                s+="[";
+                printed = 0;
+                for(i = 0; i < condLeftVar.size(); i++){
+                    //if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
+                    if(condRightGroup.get(i) == union.get(t).get(j) && union.get(t).contains(condLeftGroup.get(i))){
+                        if(printed != 0)
+                            s += ", ";
+                        String tag = condLeftVar.get(i).substring(1);
+                        s += tag;
+                        printed += 1;
+                    }
+                }
+                s += "], [";
+                printed = 0;
+                for(i = 0; i < condLeftVar.size(); i++){
+                    //if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
+                    if(condRightGroup.get(i) == union.get(t).get(j) && union.get(t).contains(condLeftGroup.get(i))){
+                        if(printed != 0)
+                            s += ", ";
+                        String tag = condRightVar.get(i).substring(1);
+                        s += tag;
+                        printed += 1;
+                    }
+                }
+                s+="]\n";
+                s+=")";
+                if(j != union.get(t).size()-1 || t != union.size()-1)
+                    s+=",";
+                s+="\n";
             }
-            s+="]\n";
-            s+=")";
-            if(j != union.size()-1)
-                s+=",";
-            s+="\n";
+            //if alone
+            //maybe need where
+            s+="return ";
         }
-        s+="return ";
         try{
         	System.out.println(s);
             output.write(s);
