@@ -66,7 +66,7 @@ public class Main {
 //			ParserRuleContext ruleContext = parser.ap();
 			ParserRuleContext ruleContext = parser.xq();
 			XqueryEvalBaseVisitor visitor = new XqueryEvalBaseVisitor();
-			TreeNode root = visitor.visit(ruleContext);
+			String root = visitor.visit(ruleContext);
 
 //			System.out.println(ruleContext.getText());
 //
