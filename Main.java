@@ -13,15 +13,15 @@ import java.io.StringWriter;
 import java.util.List;
 
 public class Main {
-	public static final String expression = "for    $pgroup in doc(\"j_caesar.xml\")//PGROUP,\n" +
-			"        $persona in $pgroup/PERSONA,\n" +
-			"        $act in doc(\"j_caesar.xml\")//ACT,\n" +
-			"        $speaker in $act//SPEECH/SPEAKER\n" +
-			" where $persona/text() = $speaker/text() and $persona/text()=\"MARULLUS\"\n" +
-			" return <tuple>{<act>{$act/TITLE}</act>,\n" +
-			"         <speaker>{$speaker}</speaker>,\n" +
-			"         <persona>{$persona}</persona>}\n" +
-			"         </tuple>\n";
+	public static final String expression = "join (for $b in doc(\"book.xml\")/book,\n" +
+			"    $tb in $b/publisher,\n" +
+			"    $pb in $b/price\n" +
+			"    return <tuple> { <b> {$b} </b> , <tb> {$tb} </tb> , <pb> {$pb} </pb> } </tuple>,\n" +
+			"    for $a in doc(\"book.xml\")/entry,\n" +
+			"    $ta in $a/publisher,\n" +
+			"    $pa in $a/price\n" +
+			"    return <tuple> { <a> {$a} </a> , <ta> {$ta} </ta> , <pa> {$pa} </pa> } </tuple>,\n" +
+			"    [tb, pb], [ta, pa] )";
 
 	public static void printXML(Node node) {
 		try	{
