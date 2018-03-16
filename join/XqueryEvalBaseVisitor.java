@@ -39,18 +39,23 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
         int i = 0;
         int printed = 0;
         String s = "";
+        for(i = 0; i < condLeftVar.size(); i++)
+            System.out.println("left "+condLeftGroup.get(i)+" right "+condRightGroup.get(i));
+        i = 0;
         //check for the where condtion
         List<Integer> union = new ArrayList<Integer>();
-//        union.add(0);
 
         while(i != condLeftVar.size()){
 
             for(i = 0; i < condLeftVar.size(); i++){
                 if(condUsed.get(i) != -1)
                     continue;      
-                if(!union.contains(condLeftGroup.get(i)) && condLeftGroup.get(i) != -1)
+                if(!union.contains(condLeftGroup.get(i)) && condLeftGroup.get(i) != -1 && union.size() == 0)
+                    break;
+                if(union.contains(condLeftGroup.get(i)))
                     break;
             }
+            System.out.println("i" + i);
             if(i != condLeftVar.size()){
                 if(union.size() == 0){ 
                     union.add(condLeftGroup.get(i));
@@ -62,7 +67,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
 	                    condUsed.set(j, layer);
                     }
                     if(condLeftGroup.get(j) == -1 && condRightGroup.get(j) == now)
-                        condUsed.set(j,layer);
+                        condUsed.set(j, layer);
                 }
 	            union.add(now);
             }
@@ -76,7 +81,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
 	    //print
         //s+="for $tuple in join(");
         s += "for $tuple in join(";
-        for(i = 0; i < layer; i++)
+        for(i = 2; i < layer; i++)
             s += "\njoin (";
         //for X in path, ....
         s += "for ";
@@ -100,7 +105,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
         if(whereFlag > 0)
             s += "\n";
         //return
-        s += "return <tuple>\n";
+        s += "return <tuple>{\n";
         for(i = 0; i < forVarList.get(0).size(); i++){
             TreeNode n = forVarList.get(0).get(i);
             String tag = n.name.substring(1);
@@ -109,7 +114,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                 s += ",";
             s+='\n';
         }
-        s+="<tuple>,\n\n";
+        s+="}</tuple>,\n\n";
 
         for(int j = 1; j < union.size(); j++){
             //for X in path, ....
@@ -123,7 +128,9 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
             }
             //where?
             whereFlag = 0;
-            for(i = 0; i < condLeftVar.size(); i++)
+            System.out.println("j "+union.get(j));
+            for(i = 0; i < condLeftVar.size(); i++){
+                System.out.println("left "+condLeftGroup.get(i)+" right "+condRightGroup.get(i));
                 if(condLeftGroup.get(i) == -1 && condRightGroup.get(i) == union.get(j)){
                     if(whereFlag == 0)
                         s+="where "+ condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
@@ -131,10 +138,11 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                         s+=condLeftVar.get(i) + " eq "+ condRightVar.get(i)+" ";
                     whereFlag += 1;
                 }
+            }
             if(whereFlag > 0)
                 s+="\n";
             //return
-            s+="return <tuple>\n";
+            s+="return <tuple>{\n";
             for(i = 0; i < forVarList.get(j).size(); i++){
                 TreeNode n = forVarList.get(j).get(i);
                 String tag = n.name.substring(1);
@@ -143,14 +151,15 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                     s+=",";
                 s+='\n';
             }
-            s+="<tuple>,\n";
+            s+="}</tuple>,\n";
             s+="[";
             printed = 0;
             for(i = 0; i < condLeftVar.size(); i++){
                 if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
                     if(printed != 0)
                         s += ", ";
-                    s += condLeftVar.get(i);
+                    String tag = condLeftVar.get(i).substring(1);
+                    s += tag;
                     printed += 1;
                 }
             }
@@ -160,7 +169,8 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
                 if(condUsed.get(i) == j-1 && condLeftGroup.get(i) != -1){
                     if(printed != 0)
                         s += ", ";
-                    s += condRightVar.get(i);
+                    String tag = condRightVar.get(i).substring(1);
+                    s += tag;
                     printed += 1;
                 }
             }
@@ -241,6 +251,7 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
 		treeNode.name = ctx.Var().getText();
 		treeNode.path = path;
 		forVarList.get(group).add(treeNode);
+		varGroups.put(ctx.Var().getText(), group);
 
 		return null;
 	}
