@@ -430,10 +430,19 @@ public class XqueryEvalBaseVisitor extends XqueryBaseVisitor<String> {
 		int leftGroup = varGroups.getOrDefault(leftVar, -1);
 		int rightGroup = varGroups.getOrDefault(rightVar, -1);
 
-		condLeftVar.add(leftVar);
-		condRightVar.add(rightVar);
-		condLeftGroup.add(Math.min(leftGroup, rightGroup));
-		condRightGroup.add(Math.max(leftGroup, rightGroup));
+        if (leftGroup < rightGroup) {
+            condLeftVar.add(leftVar);
+            condRightVar.add(rightVar);
+            condLeftGroup.add(leftGroup);
+            condRightGroup.add(rightGroup);
+        }
+        else {
+            condLeftVar.add(rightVar);
+            condRightVar.add(leftVar);
+            condLeftGroup.add(rightGroup);
+            condRightGroup.add(leftGroup);
+        }
+		
 		condUsed.add(-1);
 
 		return null;
